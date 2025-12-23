@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
-import { User, Check, X, Heart, Music, Radio } from 'lucide-react';
+import { User, Check, X, Heart, Music, Radio, BadgeCheck } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { useTasteCompatibility } from '@/hooks/useTasteCompatibility';
@@ -115,7 +115,7 @@ export function FriendsList() {
   );
 }
 
-function FriendCard({ friend }: { friend: { user_id: string; username: string | null; display_name: string | null; avatar_url: string | null } }) {
+function FriendCard({ friend }: { friend: { user_id: string; username: string | null; display_name: string | null; avatar_url: string | null; is_verified?: boolean } }) {
   const { compatibilityScore: stationScore, sharedStations, insights: stationInsights } = useTasteCompatibility(friend.user_id);
   const { score: musicScore, sharedArtists } = useMusicIdentityCompatibility(friend.user_id);
 
@@ -173,9 +173,12 @@ function FriendCard({ friend }: { friend: { user_id: string; username: string | 
       <div className="flex-1 min-w-0">
         <Link 
           to={friend.username ? `/profile/@${friend.username}` : '#'}
-          className="font-semibold hover:underline block truncate"
+          className="font-semibold hover:underline flex items-center gap-1 truncate"
         >
           {friend.display_name || friend.username || 'Anonymous'}
+          {friend.is_verified && (
+            <BadgeCheck className="w-4 h-4 text-primary fill-primary/20 flex-shrink-0" />
+          )}
         </Link>
         {friend.username && (
           <p className="text-sm text-muted-foreground">@{friend.username}</p>

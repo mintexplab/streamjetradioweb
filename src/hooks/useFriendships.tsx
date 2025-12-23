@@ -19,6 +19,7 @@ export interface FriendWithProfile extends Friendship {
     username: string | null;
     display_name: string | null;
     avatar_url: string | null;
+    is_verified: boolean;
   };
 }
 
@@ -83,7 +84,7 @@ export function useFriends() {
 
       const { data, error } = await supabase
         .from('profiles')
-        .select('user_id, username, display_name, avatar_url')
+        .select('user_id, username, display_name, avatar_url, is_verified')
         .in('user_id', friendIds);
 
       if (error) throw error;
@@ -111,7 +112,7 @@ export function usePendingFriendRequests() {
 
       const { data, error } = await supabase
         .from('profiles')
-        .select('user_id, username, display_name, avatar_url')
+        .select('user_id, username, display_name, avatar_url, is_verified')
         .in('user_id', requesterIds);
 
       if (error) throw error;

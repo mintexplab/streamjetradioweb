@@ -8,7 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { User, Radio, Play, ArrowLeft, Pin, UserPlus, Check, Clock } from 'lucide-react';
+import { User, Radio, Play, ArrowLeft, Pin, UserPlus, Check, Clock, BadgeCheck } from 'lucide-react';
 import { ProfileReactionStats } from '@/components/dashboard/ProfileReactionStats';
 import { TemporalStats } from '@/components/dashboard/TemporalStats';
 import { ProfileMusicIdentity } from '@/components/dashboard/ProfileMusicIdentity';
@@ -148,8 +148,11 @@ export default function PublicProfile() {
               </Avatar>
               
               <div className="text-center md:text-left flex-1">
-                <h1 className="text-2xl font-bold">
+                <h1 className="text-2xl font-bold flex items-center gap-2">
                   {profile.display_name || `@${profile.username}`}
+                  {profile.is_verified && (
+                    <BadgeCheck className="w-6 h-6 text-primary fill-primary/20" />
+                  )}
                 </h1>
                 <p className="text-primary">@{profile.username}</p>
                 {profile.bio && (
