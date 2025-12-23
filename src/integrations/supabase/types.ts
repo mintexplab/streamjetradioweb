@@ -365,6 +365,33 @@ export type Database = {
         }
         Relationships: []
       }
+      station_chat_messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          station_name: string
+          station_uuid: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          station_name: string
+          station_uuid: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          station_name?: string
+          station_uuid?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       station_moments: {
         Row: {
           created_at: string

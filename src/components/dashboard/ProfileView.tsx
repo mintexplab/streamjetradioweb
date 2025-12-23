@@ -10,9 +10,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
-import { User, Save, Loader2, Upload, Copy, Check, ExternalLink } from 'lucide-react';
+import { User, Save, Loader2, Upload, Copy, Check, ExternalLink, Share2 } from 'lucide-react';
 import { ProfileReactionStats } from './ProfileReactionStats';
 import { CurrentlyListeningBadge } from './CurrentlyListeningBadge';
+import { ShareableStatsCard } from './ShareableStatsCard';
 
 export function ProfileView() {
   const { user } = useAuth();
@@ -268,6 +269,22 @@ export function ProfileView() {
               Enter a username above to generate your profile link
             </p>
           )}
+        </CardContent>
+      </Card>
+
+      {/* Shareable Stats Card */}
+      <Card>
+        <CardHeader className="p-4 sm:p-6">
+          <CardTitle className="text-lg sm:text-xl flex items-center gap-2">
+            <Share2 className="h-5 w-5" />
+            Share Your Music Identity
+          </CardTitle>
+          <CardDescription className="text-sm">
+            Download or share your music identity as an image for social media
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="p-4 sm:p-6 pt-0 sm:pt-0">
+          <ShareableStatsCard />
         </CardContent>
       </Card>
 

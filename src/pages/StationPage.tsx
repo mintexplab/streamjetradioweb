@@ -1,8 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
 import { useRadioPlayer } from '@/hooks/useRadioPlayer';
 import { useActiveListeners } from '@/hooks/useActiveListeners';
 import { useStationReactions, calculateEnergy, REACTION_EMOJIS } from '@/hooks/useReactions';
@@ -11,6 +9,7 @@ import { ReactionBar } from '@/components/dashboard/ReactionBar';
 import { VibePulse } from '@/components/dashboard/VibePulse';
 import { LiveListenersBadge } from '@/components/dashboard/LiveListenersBadge';
 import { AudioVisualizer } from '@/components/dashboard/AudioVisualizer';
+import { StationChatRoom } from '@/components/dashboard/StationChatRoom';
 import { ArrowLeft, Play, Pause, Heart, Share2, Users, Radio } from 'lucide-react';
 import { useSavedStations, useSaveStation, useUnsaveStation } from '@/hooks/useSavedStations';
 import { toast } from 'sonner';
@@ -227,6 +226,12 @@ export function StationPage() {
             </CardContent>
           </Card>
         )}
+
+        {/* Station Chat Room */}
+        <StationChatRoom
+          stationUuid={stationUuid}
+          stationName={station?.name || 'Unknown Station'}
+        />
 
         {/* Recent reactions */}
         {reactions && reactions.length > 0 && (

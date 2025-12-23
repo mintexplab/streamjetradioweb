@@ -13,24 +13,25 @@ export interface Profile {
   updated_at: string;
 }
 
-export function useProfile() {
+export function useProfile(userId?: string) {
   const { user } = useAuth();
+  const targetUserId = userId || user?.id;
 
   return useQuery({
-    queryKey: ['profile', user?.id],
+    queryKey: ['profile', targetUserId],
     queryFn: async () => {
-      if (!user) return null;
+      if (!targetUserId) return null;
       
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
-        .eq('user_id', user.id)
+        .eq('user_id', targetUserId)
         .single();
 
       if (error) throw error;
       return data as Profile;
     },
-    enabled: !!user,
+    enabled: !!targetUserId,
   });
 }
 
