@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Music, Mic, Guitar, Search, X, Plus, Disc } from 'lucide-react';
+import { Music, Search, X, Plus, Disc, Play } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -34,7 +34,9 @@ import {
   useAddMusicRole,
   useRemoveMusicRole,
 } from '@/hooks/useMusicIdentity';
-import { useSearchArtists, useArtistDiscography, AudioDBArtist, AudioDBAlbum } from '@/hooks/useAudioDB';
+import { useSearchSpotifyArtists, useSearchSpotifyTracks, SpotifyArtist, SpotifyTrack } from '@/hooks/useSpotifySearch';
+import { useSpotifyAuth } from '@/hooks/useSpotifyAuth';
+import { useSpotifyPlayer } from '@/hooks/useSpotifyPlayer';
 import { Link } from 'react-router-dom';
 
 const INSTRUMENTS = [
@@ -47,12 +49,12 @@ const ROLES = [
   'Beatmaker', 'Arranger', 'Mixer', 'Mastering Engineer'
 ];
 
-function ArtistSearchDialog({ onSelect }: { onSelect: (artist: AudioDBArtist) => void }) {
+function ArtistSearchDialog({ onSelect }: { onSelect: (artist: SpotifyArtist) => void }) {
   const [search, setSearch] = useState('');
-  const { data: artists, isLoading } = useSearchArtists(search);
+  const { data: artists, isLoading } = useSearchSpotifyArtists(search);
   const [open, setOpen] = useState(false);
 
-  const handleSelect = (artist: AudioDBArtist) => {
+  const handleSelect = (artist: SpotifyArtist) => {
     onSelect(artist);
     setOpen(false);
     setSearch('');
@@ -68,7 +70,7 @@ function ArtistSearchDialog({ onSelect }: { onSelect: (artist: AudioDBArtist) =>
       </DialogTrigger>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>Search Artists</DialogTitle>
+          <DialogTitle>Search Artists on Spotify</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           <div className="relative">
@@ -91,18 +93,18 @@ function ArtistSearchDialog({ onSelect }: { onSelect: (artist: AudioDBArtist) =>
               <div className="space-y-2">
                 {artists.map((artist) => (
                   <div
-                    key={artist.idArtist}
+                    key={artist.id}
                     className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted cursor-pointer"
                     onClick={() => handleSelect(artist)}
                   >
                     <Avatar>
-                      <AvatarImage src={artist.strArtistThumb || undefined} />
-                      <AvatarFallback>{artist.strArtist[0]}</AvatarFallback>
+                      <AvatarImage src={artist.images?.[0]?.url} />
+                      <AvatarFallback>{artist.name[0]}</AvatarFallback>
                     </Avatar>
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium truncate">{artist.strArtist}</p>
+                      <p className="font-medium truncate">{artist.name}</p>
                       <p className="text-sm text-muted-foreground truncate">
-                        {artist.strGenre || artist.strStyle || 'Unknown genre'}
+                        {artist.genres?.slice(0, 2).join(', ') || 'Artist'}
                       </p>
                     </div>
                   </div>
@@ -126,134 +128,101 @@ function ArtistSearchDialog({ onSelect }: { onSelect: (artist: AudioDBArtist) =>
 
 function TrackSearchDialog({ onSelect }: { onSelect: (track: { track_id: string; track_name: string; artist_name: string; album_name?: string; track_image?: string }) => void }) {
   const [search, setSearch] = useState('');
-  const [selectedArtist, setSelectedArtist] = useState<AudioDBArtist | null>(null);
-  const { data: artists, isLoading: loadingArtists } = useSearchArtists(search);
-  const { data: discography, isLoading: loadingDiscography } = useArtistDiscography(selectedArtist?.idArtist || '');
+  const { data: tracks, isLoading } = useSearchSpotifyTracks(search);
   const [open, setOpen] = useState(false);
+  const { isPremium } = useSpotifyAuth();
+  const { play } = useSpotifyPlayer();
 
-  const handleSelectArtist = (artist: AudioDBArtist) => {
-    setSelectedArtist(artist);
-  };
-
-  const handleSelectAlbum = (album: AudioDBAlbum) => {
-    // Use album as track since free API doesn't have track search
+  const handleSelectTrack = (track: SpotifyTrack) => {
     onSelect({
-      track_id: album.idAlbum,
-      track_name: album.strAlbum,
-      artist_name: album.strArtist,
-      album_name: album.strAlbum,
-      track_image: album.strAlbumThumb || undefined,
+      track_id: track.id,
+      track_name: track.name,
+      artist_name: track.artists.map(a => a.name).join(', '),
+      album_name: track.album.name,
+      track_image: track.album.images?.[0]?.url,
     });
     setOpen(false);
     setSearch('');
-    setSelectedArtist(null);
   };
 
-  const handleBack = () => {
-    setSelectedArtist(null);
+  const handlePlay = (e: React.MouseEvent, track: SpotifyTrack) => {
+    e.stopPropagation();
+    if (isPremium) {
+      play(track.uri);
+    }
   };
 
   return (
-    <Dialog open={open} onOpenChange={(o) => { setOpen(o); if (!o) { setSelectedArtist(null); setSearch(''); } }}>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" size="sm">
           <Plus className="h-4 w-4 mr-1" />
-          Add Track/Album
+          Add Track
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>
-            {selectedArtist ? (
-              <div className="flex items-center gap-2">
-                <Button variant="ghost" size="sm" onClick={handleBack}>←</Button>
-                {selectedArtist.strArtist}'s Albums
-              </div>
-            ) : (
-              'Search by Artist'
-            )}
-          </DialogTitle>
+          <DialogTitle>Search Tracks on Spotify</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
-          {!selectedArtist ? (
-            <>
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search for an artist..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className="pl-9"
-                />
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search for a track..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pl-9"
+            />
+          </div>
+          <ScrollArea className="h-[350px]">
+            {isLoading ? (
+              <div className="space-y-2">
+                {[...Array(5)].map((_, i) => (
+                  <Skeleton key={i} className="h-16" />
+                ))}
               </div>
-              <ScrollArea className="h-[300px]">
-                {loadingArtists ? (
-                  <div className="space-y-2">
-                    {[...Array(5)].map((_, i) => (
-                      <Skeleton key={i} className="h-16" />
-                    ))}
-                  </div>
-                ) : artists && artists.length > 0 ? (
-                  <div className="space-y-2">
-                    {artists.map((artist) => (
-                      <div
-                        key={artist.idArtist}
-                        className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted cursor-pointer"
-                        onClick={() => handleSelectArtist(artist)}
-                      >
-                        <Avatar>
-                          <AvatarImage src={artist.strArtistThumb || undefined} />
-                          <AvatarFallback>{artist.strArtist[0]}</AvatarFallback>
-                        </Avatar>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium truncate">{artist.strArtist}</p>
-                          <p className="text-sm text-muted-foreground">Click to see albums</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : search.length >= 2 ? (
-                  <p className="text-center text-muted-foreground py-8">No artists found</p>
-                ) : (
-                  <p className="text-center text-muted-foreground py-8">Type at least 2 characters to search</p>
-                )}
-              </ScrollArea>
-            </>
-          ) : (
-            <ScrollArea className="h-[350px]">
-              {loadingDiscography ? (
-                <div className="space-y-2">
-                  {[...Array(5)].map((_, i) => (
-                    <Skeleton key={i} className="h-16" />
-                  ))}
-                </div>
-              ) : discography && discography.length > 0 ? (
-                <div className="space-y-2">
-                  {discography.map((album) => (
-                    <div
-                      key={album.idAlbum}
-                      className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted cursor-pointer"
-                      onClick={() => handleSelectAlbum(album)}
-                    >
-                      {album.strAlbumThumb ? (
-                        <img src={album.strAlbumThumb} alt="" className="w-12 h-12 rounded object-cover" />
+            ) : tracks && tracks.length > 0 ? (
+              <div className="space-y-2">
+                {tracks.map((track) => (
+                  <div
+                    key={track.id}
+                    className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted cursor-pointer group"
+                    onClick={() => handleSelectTrack(track)}
+                  >
+                    <div className="relative">
+                      {track.album.images?.[0]?.url ? (
+                        <img src={track.album.images[0].url} alt="" className="w-12 h-12 rounded object-cover" />
                       ) : (
                         <div className="w-12 h-12 rounded bg-muted flex items-center justify-center">
                           <Disc className="w-6 h-6 text-muted-foreground" />
                         </div>
                       )}
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium truncate">{album.strAlbum}</p>
-                        <p className="text-sm text-muted-foreground">{album.intYearReleased || 'Unknown year'}</p>
-                      </div>
+                      {isPremium && (
+                        <Button
+                          size="icon"
+                          variant="secondary"
+                          className="absolute inset-0 w-12 h-12 rounded opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={(e) => handlePlay(e, track)}
+                        >
+                          <Play className="h-5 w-5" />
+                        </Button>
+                      )}
                     </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-center text-muted-foreground py-8">No albums found</p>
-              )}
-            </ScrollArea>
-          )}
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium truncate">{track.name}</p>
+                      <p className="text-sm text-muted-foreground truncate">
+                        {track.artists.map(a => a.name).join(', ')}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : search.length >= 2 ? (
+              <p className="text-center text-muted-foreground py-8">No tracks found</p>
+            ) : (
+              <p className="text-center text-muted-foreground py-8">Type at least 2 characters to search</p>
+            )}
+          </ScrollArea>
         </div>
       </DialogContent>
     </Dialog>
@@ -312,6 +281,8 @@ export function MusicIdentityEditor() {
   const { data: favoriteArtists, isLoading: loadingArtists } = useFavoriteArtists();
   const { data: favoriteTracks, isLoading: loadingTracks } = useFavoriteTracks();
   const { data: musicRoles, isLoading: loadingRoles } = useUserMusicRoles();
+  const { isConnected, isPremium } = useSpotifyAuth();
+  const { play } = useSpotifyPlayer();
 
   const addArtist = useAddFavoriteArtist();
   const removeArtist = useRemoveFavoriteArtist();
@@ -320,12 +291,12 @@ export function MusicIdentityEditor() {
   const addRole = useAddMusicRole();
   const removeRole = useRemoveMusicRole();
 
-  const handleAddArtist = async (artist: AudioDBArtist) => {
+  const handleAddArtist = async (artist: SpotifyArtist) => {
     try {
       await addArtist.mutateAsync({
-        artist_id: artist.idArtist,
-        artist_name: artist.strArtist,
-        artist_image: artist.strArtistThumb || undefined,
+        artist_id: artist.id,
+        artist_name: artist.name,
+        artist_image: artist.images?.[0]?.url,
       });
       toast({ title: 'Artist added to favorites' });
     } catch {
@@ -345,7 +316,7 @@ export function MusicIdentityEditor() {
   const handleAddTrack = async (track: { track_id: string; track_name: string; artist_name: string; album_name?: string; track_image?: string }) => {
     try {
       await addTrack.mutateAsync(track);
-      toast({ title: 'Album added to favorites' });
+      toast({ title: 'Track added to favorites' });
     } catch {
       toast({ title: 'Failed to add', variant: 'destructive' });
     }
@@ -377,6 +348,12 @@ export function MusicIdentityEditor() {
     }
   };
 
+  const handlePlayTrack = (trackId: string) => {
+    if (isPremium) {
+      play(`spotify:track:${trackId}`);
+    }
+  };
+
   const instruments = musicRoles?.filter(r => r.role_type === 'instrument') || [];
   const roles = musicRoles?.filter(r => r.role_type === 'role') || [];
 
@@ -385,12 +362,15 @@ export function MusicIdentityEditor() {
       <div className="flex items-center gap-2">
         <Music className="h-5 w-5 text-primary" />
         <h2 className="text-xl font-semibold">Music Identity</h2>
+        <Badge variant="secondary" className="ml-2">
+          Powered by Spotify
+        </Badge>
       </div>
 
       <Tabs defaultValue="artists">
         <TabsList>
           <TabsTrigger value="artists">Favorite Artists</TabsTrigger>
-          <TabsTrigger value="tracks">Favorite Albums</TabsTrigger>
+          <TabsTrigger value="tracks">Favorite Tracks</TabsTrigger>
           <TabsTrigger value="roles">Instruments & Roles</TabsTrigger>
         </TabsList>
 
@@ -444,7 +424,8 @@ export function MusicIdentityEditor() {
         <TabsContent value="tracks" className="space-y-4">
           <div className="flex justify-between items-center">
             <p className="text-muted-foreground text-sm">
-              Add your favorite albums/tracks
+              Add your favorite tracks
+              {isPremium && <span className="text-primary ml-1">(Click to play with Premium)</span>}
             </p>
             <TrackSearchDialog onSelect={handleAddTrack} />
           </div>
@@ -458,15 +439,26 @@ export function MusicIdentityEditor() {
           ) : favoriteTracks && favoriteTracks.length > 0 ? (
             <div className="space-y-2">
               {favoriteTracks.map((track, index) => (
-                <div key={track.id} className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 group">
-                  <span className="w-5 text-muted-foreground text-sm font-medium">{index + 1}</span>
-                  {track.track_image ? (
-                    <img src={track.track_image} alt="" className="w-12 h-12 rounded object-cover" />
-                  ) : (
-                    <div className="w-12 h-12 rounded bg-muted flex items-center justify-center">
-                      <Disc className="w-6 h-6 text-muted-foreground" />
-                    </div>
-                  )}
+                <div 
+                  key={track.id} 
+                  className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 group cursor-pointer hover:bg-muted"
+                  onClick={() => handlePlayTrack(track.track_id)}
+                >
+                  <span className="text-sm text-muted-foreground w-6">{index + 1}</span>
+                  <div className="relative">
+                    {track.track_image ? (
+                      <img src={track.track_image} alt="" className="w-10 h-10 rounded object-cover" />
+                    ) : (
+                      <div className="w-10 h-10 rounded bg-muted flex items-center justify-center">
+                        <Music className="h-4 w-4 text-muted-foreground" />
+                      </div>
+                    )}
+                    {isPremium && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Play className="h-4 w-4 text-white" />
+                      </div>
+                    )}
+                  </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-medium truncate">{track.track_name}</p>
                     <p className="text-sm text-muted-foreground truncate">{track.artist_name}</p>
@@ -475,7 +467,7 @@ export function MusicIdentityEditor() {
                     variant="ghost"
                     size="icon"
                     className="opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8"
-                    onClick={() => handleRemoveTrack(track.id)}
+                    onClick={(e) => { e.stopPropagation(); handleRemoveTrack(track.id); }}
                   >
                     <X className="h-4 w-4" />
                   </Button>
@@ -484,8 +476,8 @@ export function MusicIdentityEditor() {
             </div>
           ) : (
             <Card className="p-8 text-center">
-              <Disc className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-              <p className="text-muted-foreground">No favorite albums yet</p>
+              <Music className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
+              <p className="text-muted-foreground">No favorite tracks yet</p>
             </Card>
           )}
         </TabsContent>
@@ -493,48 +485,66 @@ export function MusicIdentityEditor() {
         <TabsContent value="roles" className="space-y-6">
           <div className="space-y-4">
             <div className="flex justify-between items-center">
-              <div className="flex items-center gap-2">
-                <Guitar className="h-4 w-4" />
-                <h3 className="font-medium">Instruments</h3>
-              </div>
+              <h3 className="font-medium">Instruments I Play</h3>
               <AddRoleDialog type="instrument" onAdd={(name) => handleAddRole('instrument', name)} />
             </div>
-            <div className="flex flex-wrap gap-2">
-              {instruments.map((inst) => (
-                <Badge key={inst.id} variant="secondary" className="gap-1">
-                  {inst.role_name}
-                  <button onClick={() => handleRemoveRole(inst.id)}>
-                    <X className="h-3 w-3" />
-                  </button>
-                </Badge>
-              ))}
-              {instruments.length === 0 && (
-                <p className="text-sm text-muted-foreground">No instruments added</p>
-              )}
-            </div>
+            {loadingRoles ? (
+              <div className="flex gap-2">
+                {[...Array(3)].map((_, i) => (
+                  <Skeleton key={i} className="h-8 w-20" />
+                ))}
+              </div>
+            ) : instruments.length > 0 ? (
+              <div className="flex flex-wrap gap-2">
+                {instruments.map((role) => (
+                  <Badge key={role.id} variant="secondary" className="gap-1 pr-1">
+                    {role.role_name}
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-4 w-4 hover:bg-transparent"
+                      onClick={() => handleRemoveRole(role.id)}
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  </Badge>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">No instruments added</p>
+            )}
           </div>
 
           <div className="space-y-4">
             <div className="flex justify-between items-center">
-              <div className="flex items-center gap-2">
-                <Mic className="h-4 w-4" />
-                <h3 className="font-medium">Music Roles</h3>
-              </div>
+              <h3 className="font-medium">Music Roles</h3>
               <AddRoleDialog type="role" onAdd={(name) => handleAddRole('role', name)} />
             </div>
-            <div className="flex flex-wrap gap-2">
-              {roles.map((role) => (
-                <Badge key={role.id} variant="secondary" className="gap-1">
-                  {role.role_name}
-                  <button onClick={() => handleRemoveRole(role.id)}>
-                    <X className="h-3 w-3" />
-                  </button>
-                </Badge>
-              ))}
-              {roles.length === 0 && (
-                <p className="text-sm text-muted-foreground">No roles added</p>
-              )}
-            </div>
+            {loadingRoles ? (
+              <div className="flex gap-2">
+                {[...Array(3)].map((_, i) => (
+                  <Skeleton key={i} className="h-8 w-20" />
+                ))}
+              </div>
+            ) : roles.length > 0 ? (
+              <div className="flex flex-wrap gap-2">
+                {roles.map((role) => (
+                  <Badge key={role.id} variant="outline" className="gap-1 pr-1">
+                    {role.role_name}
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-4 w-4 hover:bg-transparent"
+                      onClick={() => handleRemoveRole(role.id)}
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  </Badge>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">No roles added</p>
+            )}
           </div>
         </TabsContent>
       </Tabs>

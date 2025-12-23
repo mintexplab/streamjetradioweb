@@ -31,7 +31,7 @@ export default function Auth() {
 
   // Redirect if already logged in
   if (!loading && user && !banInfo) {
-    navigate('/dashboard', { replace: true });
+    navigate('/player', { replace: true });
     return null;
   }
 
