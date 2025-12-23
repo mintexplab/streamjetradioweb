@@ -30,11 +30,7 @@ async function fetchStations(endpoint: string, params?: Record<string, string>):
     });
   }
   
-  const response = await fetch(url.toString(), {
-    headers: {
-      'User-Agent': 'StreamJet Radio/1.0',
-    },
-  });
+  const response = await fetch(url.toString());
   
   if (!response.ok) {
     throw new Error('Failed to fetch stations');
@@ -100,9 +96,7 @@ export function useCountries() {
   return useQuery({
     queryKey: ['countries'],
     queryFn: async () => {
-      const response = await fetch(`${RADIO_BROWSER_API}/countries`, {
-        headers: { 'User-Agent': 'StreamJet Radio/1.0' },
-      });
+      const response = await fetch(`${RADIO_BROWSER_API}/countries`);
       if (!response.ok) throw new Error('Failed to fetch countries');
       return response.json() as Promise<{ name: string; iso_3166_1: string; stationcount: number }[]>;
     },
@@ -114,9 +108,7 @@ export function useTags() {
   return useQuery({
     queryKey: ['tags'],
     queryFn: async () => {
-      const response = await fetch(`${RADIO_BROWSER_API}/tags?limit=100&order=stationcount&reverse=true`, {
-        headers: { 'User-Agent': 'StreamJet Radio/1.0' },
-      });
+      const response = await fetch(`${RADIO_BROWSER_API}/tags?limit=100&order=stationcount&reverse=true`);
       if (!response.ok) throw new Error('Failed to fetch tags');
       return response.json() as Promise<{ name: string; stationcount: number }[]>;
     },
