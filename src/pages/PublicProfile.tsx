@@ -8,6 +8,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { User, Radio, Play, Pause, ArrowLeft, ListMusic } from 'lucide-react';
+import { ProfileReactionStats } from '@/components/dashboard/ProfileReactionStats';
+import { CurrentlyListeningBadge } from '@/components/dashboard/CurrentlyListeningBadge';
 
 function usePublicProfile(username: string) {
   return useQuery({
@@ -178,7 +180,7 @@ export default function PublicProfile() {
                 </AvatarFallback>
               </Avatar>
               
-              <div className="text-center md:text-left">
+              <div className="text-center md:text-left flex-1">
                 <h1 className="text-2xl font-bold">
                   {profile.display_name || `@${profile.username}`}
                 </h1>
@@ -190,6 +192,9 @@ export default function PublicProfile() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Reaction Stats */}
+        <ProfileReactionStats userId={profile.user_id} />
 
         {/* Public Playlists */}
         <div>
