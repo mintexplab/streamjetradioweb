@@ -10,12 +10,15 @@ import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import PublicProfile from "./pages/PublicProfile";
 import { StationPage } from "./pages/StationPage";
+import ArtistPage from "./pages/ArtistPage";
 import NotFound from "./pages/NotFound";
 import { useListenerPresence } from "./hooks/useActiveListeners";
+import { useFriendListeningNotifications } from "./hooks/useFriendListeningNotifications";
 
-// Component to handle presence tracking
+// Component to handle presence tracking and friend listening notifications
 function PresenceTracker({ children }: { children: React.ReactNode }) {
   useListenerPresence();
+  useFriendListeningNotifications();
   return <>{children}</>;
 }
 
@@ -36,6 +39,7 @@ const App = () => (
                   <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/station/:stationUuid" element={<StationPage />} />
                   <Route path="/profile/:handle" element={<PublicProfile />} />
+                  <Route path="/artist/:artistId" element={<ArtistPage />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </BrowserRouter>
