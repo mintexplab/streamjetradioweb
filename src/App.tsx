@@ -7,6 +7,7 @@ import { AuthProvider } from "@/hooks/useAuth";
 import { RadioPlayerProvider } from "@/hooks/useRadioPlayer";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
+import PublicProfile from "./pages/PublicProfile";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -22,6 +23,7 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Auth />} />
               <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/profile/:handle" element={<PublicProfile />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
