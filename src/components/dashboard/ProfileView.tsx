@@ -11,6 +11,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { User, Save, Loader2, Upload, Copy, Check, ExternalLink } from 'lucide-react';
+import { ProfileReactionStats } from './ProfileReactionStats';
+import { CurrentlyListeningBadge } from './CurrentlyListeningBadge';
 
 export function ProfileView() {
   const { user } = useAuth();
@@ -166,12 +168,16 @@ export function ProfileView() {
                 onChange={handleAvatarUpload}
               />
             </div>
-            <div className="text-center sm:text-left">
+            <div className="text-center sm:text-left flex-1">
               <CardTitle className="text-lg sm:text-xl">{profile?.display_name || user?.email}</CardTitle>
               <CardDescription className="text-sm">{user?.email}</CardDescription>
               {username && (
                 <p className="text-sm text-primary mt-1">@{username}</p>
               )}
+              {/* Currently listening badge */}
+              <div className="mt-2">
+                <CurrentlyListeningBadge />
+              </div>
             </div>
           </div>
         </CardHeader>
@@ -227,13 +233,16 @@ export function ProfileView() {
         </CardContent>
       </Card>
 
+      {/* Reaction Stats Card */}
+      <ProfileReactionStats />
+
       {/* Share Profile Card */}
       <Card>
         <CardHeader className="p-4 sm:p-6">
           <CardTitle className="text-lg sm:text-xl">Share Your Profile</CardTitle>
           <CardDescription className="text-sm">
             {username 
-              ? 'Share your profile with others so they can see your playlists'
+              ? 'Share your profile with others so they can see your playlists and listening stats'
               : 'Set a username above to get a shareable profile link'}
           </CardDescription>
         </CardHeader>

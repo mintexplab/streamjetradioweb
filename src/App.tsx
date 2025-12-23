@@ -9,7 +9,15 @@ import { RadioPlayerProvider } from "@/hooks/useRadioPlayer";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import PublicProfile from "./pages/PublicProfile";
+import { StationPage } from "./pages/StationPage";
 import NotFound from "./pages/NotFound";
+import { useListenerPresence } from "./hooks/useActiveListeners";
+
+// Component to handle presence tracking
+function PresenceTracker({ children }: { children: React.ReactNode }) {
+  useListenerPresence();
+  return <>{children}</>;
+}
 
 const queryClient = new QueryClient();
 
@@ -18,18 +26,21 @@ const App = () => (
     <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
       <AuthProvider>
         <RadioPlayerProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <Routes>
-                <Route path="/" element={<Auth />} />
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/profile/:handle" element={<PublicProfile />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </BrowserRouter>
-          </TooltipProvider>
+          <PresenceTracker>
+            <TooltipProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+                <Routes>
+                  <Route path="/" element={<Auth />} />
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/station/:stationUuid" element={<StationPage />} />
+                  <Route path="/profile/:handle" element={<PublicProfile />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </BrowserRouter>
+            </TooltipProvider>
+          </PresenceTracker>
         </RadioPlayerProvider>
       </AuthProvider>
     </ThemeProvider>
