@@ -57,6 +57,15 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        // StreamJet brand colors
+        streamjet: {
+          red: "hsl(var(--streamjet-red))",
+          purple: "hsl(var(--streamjet-purple))",
+          blue: "hsl(var(--streamjet-blue))",
+          "red-muted": "hsl(var(--streamjet-red-muted))",
+          "purple-muted": "hsl(var(--streamjet-purple-muted))",
+          "blue-muted": "hsl(var(--streamjet-blue-muted))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
