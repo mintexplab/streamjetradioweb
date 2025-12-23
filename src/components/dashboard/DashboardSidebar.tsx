@@ -16,6 +16,7 @@ import { Button } from '@/components/ui/button';
 import { Radio, Compass, Heart, ListMusic, User, LogOut, Plus } from 'lucide-react';
 import { Playlist, useCreatePlaylist } from '@/hooks/usePlaylists';
 import { useToast } from '@/hooks/use-toast';
+import { ThemeToggle } from './ThemeToggle';
 
 interface DashboardSidebarProps {
   view: string;
@@ -57,11 +58,14 @@ export function DashboardSidebar({ view, setView, playlists, onSelectPlaylist }:
   return (
     <Sidebar className="border-r border-sidebar-border">
       <SidebarHeader className="p-4">
-        <div className="flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-gradient-brand">
-            <Radio className="w-5 h-5 text-white" />
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-gradient-brand">
+              <Radio className="w-5 h-5 text-primary-foreground" />
+            </div>
+            <span className="font-bold text-lg text-gradient-brand">StreamJet</span>
           </div>
-          <span className="font-bold text-lg text-gradient-brand">StreamJet</span>
+          <ThemeToggle />
         </div>
       </SidebarHeader>
 
@@ -131,7 +135,7 @@ export function DashboardSidebar({ view, setView, playlists, onSelectPlaylist }:
       <SidebarFooter className="p-4 space-y-2">
         <SidebarMenuButton onClick={() => setView('profile')}>
           <User className="w-4 h-4" />
-          <span className="truncate">{user?.email}</span>
+          <span className="truncate text-sm">{user?.email}</span>
         </SidebarMenuButton>
         <Button
           variant="ghost"

@@ -134,28 +134,28 @@ export function ProfileView() {
   }
 
   return (
-    <div className="max-w-2xl space-y-6">
-      <h2 className="text-2xl font-bold">Profile Settings</h2>
+    <div className="max-w-2xl space-y-4 sm:space-y-6">
+      <h2 className="text-xl sm:text-2xl font-bold">Profile Settings</h2>
 
       <Card>
-        <CardHeader>
-          <div className="flex items-center gap-4">
+        <CardHeader className="p-4 sm:p-6">
+          <div className="flex flex-col sm:flex-row items-center gap-4">
             <div className="relative group">
-              <Avatar className="w-20 h-20">
+              <Avatar className="w-16 h-16 sm:w-20 sm:h-20">
                 <AvatarImage src={profile?.avatar_url || ''} />
-                <AvatarFallback className="bg-gradient-brand text-white text-2xl">
-                  <User className="w-10 h-10" />
+                <AvatarFallback className="bg-gradient-brand text-primary-foreground text-xl sm:text-2xl">
+                  <User className="w-8 h-8 sm:w-10 sm:h-10" />
                 </AvatarFallback>
               </Avatar>
               <button
-                className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                className="absolute inset-0 flex items-center justify-center bg-background/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={uploading}
               >
                 {uploading ? (
-                  <Loader2 className="w-6 h-6 text-white animate-spin" />
+                  <Loader2 className="w-5 h-5 sm:w-6 sm:h-6 text-foreground animate-spin" />
                 ) : (
-                  <Upload className="w-6 h-6 text-white" />
+                  <Upload className="w-5 h-5 sm:w-6 sm:h-6 text-foreground" />
                 )}
               </button>
               <input
@@ -166,16 +166,16 @@ export function ProfileView() {
                 onChange={handleAvatarUpload}
               />
             </div>
-            <div>
-              <CardTitle>{profile?.display_name || user?.email}</CardTitle>
-              <CardDescription>{user?.email}</CardDescription>
+            <div className="text-center sm:text-left">
+              <CardTitle className="text-lg sm:text-xl">{profile?.display_name || user?.email}</CardTitle>
+              <CardDescription className="text-sm">{user?.email}</CardDescription>
               {username && (
                 <p className="text-sm text-primary mt-1">@{username}</p>
               )}
             </div>
           </div>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 p-4 sm:p-6 pt-0 sm:pt-0">
           <div className="space-y-2">
             <Label htmlFor="displayName">Display Name</Label>
             <Input
@@ -200,7 +200,7 @@ export function ProfileView() {
                 />
               </div>
             </div>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-xs sm:text-sm text-muted-foreground">
               Only lowercase letters, numbers, and underscores
             </p>
           </div>
@@ -216,7 +216,7 @@ export function ProfileView() {
             />
           </div>
 
-          <Button onClick={handleSave} disabled={updateProfile.isPending}>
+          <Button onClick={handleSave} disabled={updateProfile.isPending} className="w-full sm:w-auto">
             {updateProfile.isPending ? (
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
             ) : (
@@ -229,31 +229,33 @@ export function ProfileView() {
 
       {/* Share Profile Card */}
       <Card>
-        <CardHeader>
-          <CardTitle>Share Your Profile</CardTitle>
-          <CardDescription>
+        <CardHeader className="p-4 sm:p-6">
+          <CardTitle className="text-lg sm:text-xl">Share Your Profile</CardTitle>
+          <CardDescription className="text-sm">
             {username 
               ? 'Share your profile with others so they can see your playlists'
               : 'Set a username above to get a shareable profile link'}
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-4 sm:p-6 pt-0 sm:pt-0">
           {profileUrl ? (
-            <div className="flex items-center gap-2">
-              <code className="flex-1 p-2 bg-muted rounded-md text-sm truncate">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+              <code className="flex-1 p-2 bg-muted rounded-md text-xs sm:text-sm truncate">
                 {profileUrl}
               </code>
-              <Button variant="outline" size="icon" onClick={handleCopyLink}>
-                {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-              </Button>
-              <Button variant="outline" size="icon" asChild>
-                <a href={profileUrl} target="_blank" rel="noopener noreferrer">
-                  <ExternalLink className="w-4 h-4" />
-                </a>
-              </Button>
+              <div className="flex gap-2">
+                <Button variant="outline" size="icon" onClick={handleCopyLink} className="flex-1 sm:flex-none">
+                  {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                </Button>
+                <Button variant="outline" size="icon" asChild className="flex-1 sm:flex-none">
+                  <a href={profileUrl} target="_blank" rel="noopener noreferrer">
+                    <ExternalLink className="w-4 h-4" />
+                  </a>
+                </Button>
+              </div>
             </div>
           ) : (
-            <p className="text-muted-foreground">
+            <p className="text-muted-foreground text-sm">
               Enter a username above to generate your profile link
             </p>
           )}
@@ -261,11 +263,11 @@ export function ProfileView() {
       </Card>
 
       <Card>
-        <CardHeader>
-          <CardTitle>Account</CardTitle>
-          <CardDescription>Manage your account settings</CardDescription>
+        <CardHeader className="p-4 sm:p-6">
+          <CardTitle className="text-lg sm:text-xl">Account</CardTitle>
+          <CardDescription className="text-sm">Manage your account settings</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-4 sm:p-6 pt-0 sm:pt-0">
           <p className="text-sm text-muted-foreground">
             Member since {profile ? new Date(profile.created_at).toLocaleDateString() : 'N/A'}
           </p>
