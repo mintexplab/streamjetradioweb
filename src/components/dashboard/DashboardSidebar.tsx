@@ -13,12 +13,13 @@ import {
   SidebarFooter,
 } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
-import { Radio, Compass, Heart, User, LogOut, Users, MessageSquare, Search, Pin } from 'lucide-react';
+import { Radio, Compass, Heart, User, LogOut, Users, MessageSquare, Search, Pin, MapPin, Music } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
+import { NotificationsPopover } from './NotificationsPopover';
 
 interface DashboardSidebarProps {
   view: string;
-  setView: (view: 'discover' | 'saved' | 'feed' | 'friends' | 'search' | 'library' | 'profile') => void;
+  setView: (view: 'discover' | 'saved' | 'feed' | 'friends' | 'search' | 'library' | 'neighborhoods' | 'identity' | 'profile') => void;
 }
 
 export function DashboardSidebar({ view, setView }: DashboardSidebarProps) {
@@ -40,7 +41,10 @@ export function DashboardSidebar({ view, setView }: DashboardSidebarProps) {
             </div>
             <span className="font-bold text-lg text-gradient-brand">StreamJet</span>
           </div>
-          <ThemeToggle />
+          <div className="flex items-center gap-1">
+            <NotificationsPopover />
+            <ThemeToggle />
+          </div>
         </div>
       </SidebarHeader>
 
@@ -91,6 +95,26 @@ export function DashboardSidebar({ view, setView }: DashboardSidebarProps) {
                 <SidebarMenuButton isActive={view === 'search'} onClick={() => setView('search')}>
                   <Search className="w-4 h-4" />
                   <span>Find Users</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton isActive={view === 'neighborhoods'} onClick={() => setView('neighborhoods')}>
+                  <MapPin className="w-4 h-4" />
+                  <span>Neighborhoods</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarGroup>
+          <SidebarGroupLabel>Identity</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton isActive={view === 'identity'} onClick={() => setView('identity')}>
+                  <Music className="w-4 h-4" />
+                  <span>Music Identity</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>

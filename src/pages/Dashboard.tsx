@@ -17,11 +17,13 @@ import { FriendsList } from '@/components/dashboard/FriendsList';
 import { UserSearch } from '@/components/dashboard/UserSearch';
 import { ActivityFeed } from '@/components/dashboard/ActivityFeed';
 import { StationLibrary } from '@/components/dashboard/StationLibrary';
+import { NeighborhoodsView } from '@/components/dashboard/NeighborhoodsView';
+import { MusicIdentityEditor } from '@/components/dashboard/MusicIdentityEditor';
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
 import { Navigate } from 'react-router-dom';
 import { Loader2, Users } from 'lucide-react';
 
-type View = 'discover' | 'saved' | 'feed' | 'friends' | 'search' | 'library' | 'profile';
+type View = 'discover' | 'saved' | 'feed' | 'friends' | 'search' | 'library' | 'neighborhoods' | 'identity' | 'profile';
 type FilterType = { type: 'country' | 'tag' | 'none'; value?: string };
 
 export default function Dashboard() {
@@ -114,6 +116,8 @@ export default function Dashboard() {
           {view === 'library' && <StationLibrary />}
           {view === 'friends' && <FriendsList />}
           {view === 'search' && <UserSearch />}
+          {view === 'neighborhoods' && <NeighborhoodsView />}
+          {view === 'identity' && <MusicIdentityEditor />}
           {view === 'profile' && <ProfileView />}
         </div>
         <PlayerBar />

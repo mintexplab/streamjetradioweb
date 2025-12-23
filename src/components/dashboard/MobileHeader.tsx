@@ -1,6 +1,7 @@
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { Radio } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
+import { NotificationsPopover } from './NotificationsPopover';
 
 export function MobileHeader() {
   return (
@@ -14,7 +15,10 @@ export function MobileHeader() {
           <span className="font-bold text-gradient-brand">StreamJet</span>
         </div>
       </div>
-      <ThemeToggle />
+      <div className="flex items-center gap-1">
+        <NotificationsPopover />
+        <ThemeToggle />
+      </div>
     </header>
   );
 }

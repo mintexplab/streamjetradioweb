@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useEffect } from 'react';
+import { createNotification } from './useNotifications';
 
 export interface Friendship {
   id: string;
@@ -143,6 +144,25 @@ export function useSendFriendRequest() {
         .single();
 
       if (error) throw error;
+
+      // Get requester's profile for notification
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('display_name, username')
+        .eq('user_id', user.id)
+        .single();
+
+      const senderName = profile?.display_name || profile?.username || 'Someone';
+
+      // Send notification to addressee
+      await createNotification(
+        addresseeId,
+        'friend_request',
+        'New friend request',
+        `${senderName} wants to be your friend`,
+        { requester_id: user.id }
+      );
+
       return data;
     },
     onSuccess: () => {
@@ -153,6 +173,7 @@ export function useSendFriendRequest() {
 
 export function useRespondToFriendRequest() {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   return useMutation({
     mutationFn: async ({ 
@@ -170,6 +191,26 @@ export function useRespondToFriendRequest() {
         .single();
 
       if (error) throw error;
+
+      // If accepted, notify the requester
+      if (accept && user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('display_name, username')
+          .eq('user_id', user.id)
+          .single();
+
+        const accepterName = profile?.display_name || profile?.username || 'Someone';
+
+        await createNotification(
+          data.requester_id,
+          'friend_accepted',
+          'Friend request accepted!',
+          `${accepterName} accepted your friend request`,
+          { friend_id: user.id }
+        );
+      }
+
       return data;
     },
     onSuccess: () => {
