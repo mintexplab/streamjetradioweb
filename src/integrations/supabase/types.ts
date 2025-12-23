@@ -41,6 +41,72 @@ export type Database = {
         }
         Relationships: []
       }
+      favorite_artists: {
+        Row: {
+          artist_id: string
+          artist_image: string | null
+          artist_name: string
+          created_at: string
+          id: string
+          position: number
+          user_id: string
+        }
+        Insert: {
+          artist_id: string
+          artist_image?: string | null
+          artist_name: string
+          created_at?: string
+          id?: string
+          position?: number
+          user_id: string
+        }
+        Update: {
+          artist_id?: string
+          artist_image?: string | null
+          artist_name?: string
+          created_at?: string
+          id?: string
+          position?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      favorite_tracks: {
+        Row: {
+          album_name: string | null
+          artist_name: string
+          created_at: string
+          id: string
+          position: number
+          track_id: string
+          track_image: string | null
+          track_name: string
+          user_id: string
+        }
+        Insert: {
+          album_name?: string | null
+          artist_name: string
+          created_at?: string
+          id?: string
+          position?: number
+          track_id: string
+          track_image?: string | null
+          track_name: string
+          user_id: string
+        }
+        Update: {
+          album_name?: string | null
+          artist_name?: string
+          created_at?: string
+          id?: string
+          position?: number
+          track_id?: string
+          track_image?: string | null
+          track_name?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       friendships: {
         Row: {
           addressee_id: string
@@ -94,6 +160,63 @@ export type Database = {
           started_at?: string
           station_name?: string
           station_uuid?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      neighborhoods: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          vibe_tags: string[] | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          vibe_tags?: string[] | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          vibe_tags?: string[] | null
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          created_at: string
+          data: Json | null
+          id: string
+          message: string | null
+          read: boolean
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          data?: Json | null
+          id?: string
+          message?: string | null
+          read?: boolean
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          data?: Json | null
+          id?: string
+          message?: string | null
+          read?: boolean
+          title?: string
+          type?: string
           user_id?: string
         }
         Relationships: []
@@ -301,6 +424,62 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      user_music_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role_name: string
+          role_type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role_name: string
+          role_type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role_name?: string
+          role_type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_neighborhoods: {
+        Row: {
+          affinity_score: number | null
+          id: string
+          joined_at: string
+          neighborhood_id: string
+          user_id: string
+        }
+        Insert: {
+          affinity_score?: number | null
+          id?: string
+          joined_at?: string
+          neighborhood_id: string
+          user_id: string
+        }
+        Update: {
+          affinity_score?: number | null
+          id?: string
+          joined_at?: string
+          neighborhood_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_neighborhoods_neighborhood_id_fkey"
+            columns: ["neighborhood_id"]
+            isOneToOne: false
+            referencedRelation: "neighborhoods"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
