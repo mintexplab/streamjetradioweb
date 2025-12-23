@@ -4,15 +4,15 @@ import { supabase } from '@/integrations/supabase/client';
 import { usePinnedStations } from '@/hooks/usePinnedStations';
 import { useRadioPlayer } from '@/hooks/useRadioPlayer';
 import { useFriendshipStatus, useSendFriendRequest } from '@/hooks/useFriendships';
-import { useTasteCompatibility } from '@/hooks/useTasteCompatibility';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Badge } from '@/components/ui/badge';
-import { User, Radio, Play, ArrowLeft, Pin, UserPlus, Check, Clock, Percent } from 'lucide-react';
+import { User, Radio, Play, ArrowLeft, Pin, UserPlus, Check, Clock } from 'lucide-react';
 import { ProfileReactionStats } from '@/components/dashboard/ProfileReactionStats';
-import { ListeningStats } from '@/components/dashboard/ListeningStats';
+import { TemporalStats } from '@/components/dashboard/TemporalStats';
+import { ProfileMusicIdentity } from '@/components/dashboard/ProfileMusicIdentity';
+import { TasteCompatibilityDisplay } from '@/components/dashboard/TasteCompatibilityDisplay';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -45,7 +45,6 @@ export default function PublicProfile() {
   
   const { isFriend, isPending, isRequester } = useFriendshipStatus(profile?.user_id || '');
   const sendRequest = useSendFriendRequest();
-  const { compatibilityScore, insights } = useTasteCompatibility(profile?.user_id || '');
 
   const handleAddFriend = async () => {
     if (!profile) return;
@@ -90,7 +89,7 @@ export default function PublicProfile() {
   if (loadingProfile) {
     return (
       <div className="min-h-screen bg-background p-6">
-        <div className="max-w-2xl mx-auto space-y-6">
+        <div className="max-w-4xl mx-auto space-y-6">
           <Skeleton className="h-32 w-full" />
           <Skeleton className="h-48 w-full" />
         </div>
@@ -136,7 +135,8 @@ export default function PublicProfile() {
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto p-6 space-y-8">
+      <main className="max-w-4xl mx-auto p-6 space-y-6">
+        {/* Profile Header */}
         <Card>
           <CardContent className="p-8">
             <div className="flex flex-col md:flex-row items-center gap-6">
@@ -154,19 +154,6 @@ export default function PublicProfile() {
                 <p className="text-primary">@{profile.username}</p>
                 {profile.bio && (
                   <p className="text-muted-foreground mt-2 max-w-md">{profile.bio}</p>
-                )}
-
-                {/* Compatibility badge */}
-                {!isOwnProfile && compatibilityScore > 0 && (
-                  <div className="mt-3 flex items-center gap-2 flex-wrap justify-center md:justify-start">
-                    <Badge variant="secondary" className="text-sm">
-                      <Percent className="w-3 h-3 mr-1" />
-                      {compatibilityScore}% taste match
-                    </Badge>
-                    {insights[0] && (
-                      <span className="text-sm text-muted-foreground">{insights[0]}</span>
-                    )}
-                  </div>
                 )}
               </div>
 
@@ -195,11 +182,26 @@ export default function PublicProfile() {
           </CardContent>
         </Card>
 
+        {/* Taste Compatibility - Only show on other profiles */}
+        {!isOwnProfile && user && (
+          <TasteCompatibilityDisplay userId={profile.user_id} showDetails />
+        )}
+
+        {/* Music Identity */}
+        <ProfileMusicIdentity userId={profile.user_id} />
+
         {/* Reaction Stats */}
         <ProfileReactionStats userId={profile.user_id} />
 
-        {/* Listening Stats */}
-        <ListeningStats userId={profile.user_id} />
+        {/* Temporal Listening Stats */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg">Listening Stats</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <TemporalStats userId={profile.user_id} />
+          </CardContent>
+        </Card>
 
         {/* Go-To Stations */}
         {goToStations.length > 0 && (
