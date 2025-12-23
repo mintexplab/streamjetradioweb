@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { useTopStations, useSearchStations, RadioStation } from '@/hooks/useRadioStations';
+import { useTopStations, useSearchStations, useStationsByCountry, useStationsByTag } from '@/hooks/useRadioStations';
 import { useSavedStations } from '@/hooks/useSavedStations';
 import { usePlaylists } from '@/hooks/usePlaylists';
-import { useRadioPlayer } from '@/hooks/useRadioPlayer';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { StationGrid } from '@/components/dashboard/StationGrid';
 import { PlayerBar } from '@/components/dashboard/PlayerBar';
 import { SearchBar } from '@/components/dashboard/SearchBar';
+import { StationFilters } from '@/components/dashboard/StationFilters';
 import { PlaylistView } from '@/components/dashboard/PlaylistView';
 import { ProfileView } from '@/components/dashboard/ProfileView';
 import { SavedStationsView } from '@/components/dashboard/SavedStationsView';
@@ -17,6 +17,7 @@ import { Navigate, useSearchParams } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 
 type View = 'discover' | 'saved' | 'playlist' | 'profile' | 'shared';
+type FilterType = { type: 'country' | 'tag' | 'none'; value?: string };
 
 export default function Dashboard() {
   const { user, loading: authLoading } = useAuth();
@@ -24,9 +25,18 @@ export default function Dashboard() {
   const [view, setView] = useState<View>('discover');
   const [selectedPlaylistId, setSelectedPlaylistId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [activeFilter, setActiveFilter] = useState<FilterType>({ type: 'none' });
 
   const { data: topStations, isLoading: loadingTop } = useTopStations(30);
   const { data: searchResults, isLoading: loadingSearch } = useSearchStations(searchQuery, 50);
+  const { data: countryStations, isLoading: loadingCountry } = useStationsByCountry(
+    activeFilter.type === 'country' ? activeFilter.value || '' : '',
+    50
+  );
+  const { data: tagStations, isLoading: loadingTag } = useStationsByTag(
+    activeFilter.type === 'tag' ? activeFilter.value || '' : '',
+    50
+  );
   const { data: savedStations } = useSavedStations();
   const { data: playlists } = usePlaylists();
 
@@ -42,7 +52,7 @@ export default function Dashboard() {
   }
 
   if (!user) {
-    return <Navigate to="/auth" replace />;
+    return <Navigate to="/" replace />;
   }
 
   if (shareCode) {
@@ -65,8 +75,29 @@ export default function Dashboard() {
     );
   }
 
-  const stations = searchQuery ? searchResults : topStations;
-  const isLoading = searchQuery ? loadingSearch : loadingTop;
+  // Determine which stations to show based on search and filters
+  let stations = topStations || [];
+  let isLoading = loadingTop;
+  let title = 'Trending Stations';
+
+  if (searchQuery) {
+    stations = searchResults || [];
+    isLoading = loadingSearch;
+    title = 'Search Results';
+  } else if (activeFilter.type === 'country' && activeFilter.value) {
+    stations = countryStations || [];
+    isLoading = loadingCountry;
+    title = `Stations in ${activeFilter.value}`;
+  } else if (activeFilter.type === 'tag' && activeFilter.value) {
+    stations = tagStations || [];
+    isLoading = loadingTag;
+    title = `${activeFilter.value.charAt(0).toUpperCase() + activeFilter.value.slice(1)} Stations`;
+  }
+
+  const handleFilterChange = (type: 'country' | 'tag' | 'none', value?: string) => {
+    setActiveFilter({ type, value });
+    setSearchQuery(''); // Clear search when filtering
+  };
 
   return (
     <SidebarProvider>
@@ -83,12 +114,21 @@ export default function Dashboard() {
         <div className="p-6">
           {view === 'discover' && (
             <>
-              <SearchBar value={searchQuery} onChange={setSearchQuery} />
-              <h2 className="text-2xl font-bold mb-4 mt-6">
-                {searchQuery ? 'Search Results' : 'Trending Stations'}
-              </h2>
+              <SearchBar value={searchQuery} onChange={(v) => {
+                setSearchQuery(v);
+                if (v) setActiveFilter({ type: 'none' }); // Clear filter when searching
+              }} />
+              
+              <div className="mt-6">
+                <StationFilters 
+                  onFilterChange={handleFilterChange} 
+                  activeFilter={activeFilter} 
+                />
+              </div>
+
+              <h2 className="text-2xl font-bold mb-4 mt-6">{title}</h2>
               <StationGrid
-                stations={stations || []}
+                stations={stations}
                 isLoading={isLoading}
                 emptyMessage={searchQuery ? 'No stations found' : 'No stations available'}
               />
