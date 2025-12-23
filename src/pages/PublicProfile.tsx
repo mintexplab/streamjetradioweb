@@ -1,15 +1,20 @@
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { usePlaylistStations } from '@/hooks/usePlaylists';
+import { usePinnedStations } from '@/hooks/usePinnedStations';
 import { useRadioPlayer } from '@/hooks/useRadioPlayer';
+import { useFriendshipStatus, useSendFriendRequest } from '@/hooks/useFriendships';
+import { useTasteCompatibility } from '@/hooks/useTasteCompatibility';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { User, Radio, Play, Pause, ArrowLeft, ListMusic } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { User, Radio, Play, ArrowLeft, Pin, UserPlus, Check, Clock, Percent } from 'lucide-react';
 import { ProfileReactionStats } from '@/components/dashboard/ProfileReactionStats';
-import { CurrentlyListeningBadge } from '@/components/dashboard/CurrentlyListeningBadge';
+import { ListeningStats } from '@/components/dashboard/ListeningStats';
+import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/useAuth';
 
 function usePublicProfile(username: string) {
   return useQuery({
@@ -28,31 +33,32 @@ function usePublicProfile(username: string) {
   });
 }
 
-function usePublicPlaylists(userId: string) {
-  return useQuery({
-    queryKey: ['public-playlists', userId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('playlists')
-        .select('*')
-        .eq('user_id', userId)
-        .eq('is_public', true)
-        .order('updated_at', { ascending: false });
-      
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!userId,
-  });
-}
-
-function PlaylistCard({ playlist }: { playlist: any }) {
-  const { data: stations } = usePlaylistStations(playlist.id);
+export default function PublicProfile() {
+  const { handle } = useParams<{ handle: string }>();
+  const { user } = useAuth();
+  const username = handle?.startsWith('@') ? handle.slice(1) : handle;
+  const { toast } = useToast();
+  
+  const { data: profile, isLoading: loadingProfile, error } = usePublicProfile(username || '');
+  const { data: pinnedStations, isLoading: loadingStations } = usePinnedStations(profile?.user_id);
   const { currentStation, isPlaying, play, pause, resume } = useRadioPlayer();
+  
+  const { isFriend, isPending, isRequester } = useFriendshipStatus(profile?.user_id || '');
+  const sendRequest = useSendFriendRequest();
+  const { compatibilityScore, insights } = useTasteCompatibility(profile?.user_id || '');
 
-  const handlePlayFirst = () => {
-    if (!stations || stations.length === 0) return;
-    const station = stations[0];
+  const handleAddFriend = async () => {
+    if (!profile) return;
+    try {
+      await sendRequest.mutateAsync(profile.user_id);
+      toast({ title: 'Friend request sent!' });
+    } catch {
+      toast({ title: 'Failed to send request', variant: 'destructive' });
+    }
+  };
+
+  const handlePlayStation = (station: typeof pinnedStations extends (infer T)[] ? T : never) => {
+    if (!station) return;
     const stationData = {
       stationuuid: station.station_uuid,
       name: station.station_name,
@@ -80,45 +86,6 @@ function PlaylistCard({ playlist }: { playlist: any }) {
       play(stationData);
     }
   };
-
-  return (
-    <Card className="hover:shadow-brand transition-shadow">
-      <CardContent className="p-4">
-        <div className="flex items-center gap-4">
-          <Button
-            size="icon"
-            className="rounded-full flex-shrink-0"
-            onClick={handlePlayFirst}
-            disabled={!stations || stations.length === 0}
-          >
-            <Play className="w-5 h-5 ml-0.5" />
-          </Button>
-          
-          <div className="flex-1 min-w-0">
-            <h3 className="font-semibold truncate">{playlist.name}</h3>
-            <p className="text-sm text-muted-foreground">
-              {stations?.length || 0} stations
-            </p>
-          </div>
-          
-          <Link to={`/dashboard?share=${playlist.share_code}`}>
-            <Button variant="outline" size="sm">
-              <ListMusic className="w-4 h-4 mr-2" />
-              View
-            </Button>
-          </Link>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
-export default function PublicProfile() {
-  const { handle } = useParams<{ handle: string }>();
-  const username = handle?.startsWith('@') ? handle.slice(1) : handle;
-  
-  const { data: profile, isLoading: loadingProfile, error } = usePublicProfile(username || '');
-  const { data: playlists, isLoading: loadingPlaylists } = usePublicPlaylists(profile?.user_id || '');
 
   if (loadingProfile) {
     return (
@@ -153,12 +120,14 @@ export default function PublicProfile() {
     );
   }
 
+  const isOwnProfile = user?.id === profile.user_id;
+  const goToStations = pinnedStations?.filter(s => s.is_go_to) || [];
+
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
       <header className="border-b border-border">
         <div className="max-w-4xl mx-auto p-4 flex items-center gap-4">
-          <Link to="/" className="flex items-center gap-2">
+          <Link to="/dashboard" className="flex items-center gap-2">
             <div className="p-2 rounded-lg bg-gradient-brand">
               <Radio className="w-5 h-5 text-white" />
             </div>
@@ -167,9 +136,7 @@ export default function PublicProfile() {
         </div>
       </header>
 
-      {/* Profile Content */}
       <main className="max-w-4xl mx-auto p-6 space-y-8">
-        {/* Profile Header */}
         <Card>
           <CardContent className="p-8">
             <div className="flex flex-col md:flex-row items-center gap-6">
@@ -188,7 +155,42 @@ export default function PublicProfile() {
                 {profile.bio && (
                   <p className="text-muted-foreground mt-2 max-w-md">{profile.bio}</p>
                 )}
+
+                {/* Compatibility badge */}
+                {!isOwnProfile && compatibilityScore > 0 && (
+                  <div className="mt-3 flex items-center gap-2 flex-wrap justify-center md:justify-start">
+                    <Badge variant="secondary" className="text-sm">
+                      <Percent className="w-3 h-3 mr-1" />
+                      {compatibilityScore}% taste match
+                    </Badge>
+                    {insights[0] && (
+                      <span className="text-sm text-muted-foreground">{insights[0]}</span>
+                    )}
+                  </div>
+                )}
               </div>
+
+              {/* Friend actions */}
+              {!isOwnProfile && user && (
+                <div>
+                  {isFriend ? (
+                    <Button variant="outline" disabled>
+                      <Check className="w-4 h-4 mr-2" />
+                      Friends
+                    </Button>
+                  ) : isPending ? (
+                    <Button variant="outline" disabled>
+                      <Clock className="w-4 h-4 mr-2" />
+                      {isRequester ? 'Request Sent' : 'Pending'}
+                    </Button>
+                  ) : (
+                    <Button onClick={handleAddFriend} disabled={sendRequest.isPending}>
+                      <UserPlus className="w-4 h-4 mr-2" />
+                      Add Friend
+                    </Button>
+                  )}
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -196,33 +198,58 @@ export default function PublicProfile() {
         {/* Reaction Stats */}
         <ProfileReactionStats userId={profile.user_id} />
 
-        {/* Public Playlists */}
-        <div>
-          <h2 className="text-xl font-semibold mb-4">Public Playlists</h2>
-          
-          {loadingPlaylists ? (
-            <div className="space-y-3">
-              {Array.from({ length: 3 }).map((_, i) => (
-                <Skeleton key={i} className="h-20" />
-              ))}
-            </div>
-          ) : playlists && playlists.length > 0 ? (
-            <div className="space-y-3">
-              {playlists.map((playlist) => (
-                <PlaylistCard key={playlist.id} playlist={playlist} />
-              ))}
-            </div>
-          ) : (
-            <Card>
-              <CardContent className="p-8 text-center">
-                <ListMusic className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground">
-                  No public playlists yet
-                </p>
-              </CardContent>
-            </Card>
-          )}
-        </div>
+        {/* Listening Stats */}
+        <ListeningStats userId={profile.user_id} />
+
+        {/* Go-To Stations */}
+        {goToStations.length > 0 && (
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Pin className="w-5 h-5" />
+                Go-To Stations
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {goToStations.map((station) => {
+                const isCurrentStation = currentStation?.stationuuid === station.station_uuid;
+                return (
+                  <div 
+                    key={station.id}
+                    className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors"
+                  >
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={() => handlePlayStation(station)}
+                    >
+                      <Play className="w-4 h-4" />
+                    </Button>
+                    
+                    {station.station_favicon ? (
+                      <img
+                        src={station.station_favicon}
+                        alt=""
+                        className="w-10 h-10 rounded-md object-cover bg-muted"
+                      />
+                    ) : (
+                      <div className="w-10 h-10 rounded-md bg-primary/20 flex items-center justify-center">
+                        <Radio className="w-5 h-5 text-primary" />
+                      </div>
+                    )}
+                    
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium truncate">{station.station_name}</p>
+                      {station.station_country && (
+                        <p className="text-sm text-muted-foreground">{station.station_country}</p>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </CardContent>
+          </Card>
+        )}
       </main>
     </div>
   );

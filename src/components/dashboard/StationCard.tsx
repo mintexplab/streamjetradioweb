@@ -1,7 +1,7 @@
 import { RadioStation } from '@/hooks/useRadioStations';
 import { useRadioPlayer } from '@/hooks/useRadioPlayer';
 import { useSavedStations, useSaveStation, useUnsaveStation } from '@/hooks/useSavedStations';
-import { usePlaylists, useAddStationToPlaylist } from '@/hooks/usePlaylists';
+import { usePinStation, useIsPinned } from '@/hooks/usePinnedStations';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
@@ -9,11 +9,8 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  DropdownMenuSub,
-  DropdownMenuSubTrigger,
-  DropdownMenuSubContent,
 } from '@/components/ui/dropdown-menu';
-import { Play, Pause, Heart, MoreHorizontal, ListPlus, Radio } from 'lucide-react';
+import { Play, Pause, Heart, MoreHorizontal, Pin, Radio, Star } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { ReactionBar } from './ReactionBar';
 import { EnergyMeter } from './EnergyMeter';
@@ -32,10 +29,10 @@ export function StationCard({ station, showRemove, onRemove }: StationCardProps)
   const { user } = useAuth();
   const { currentStation, isPlaying, play, pause, resume } = useRadioPlayer();
   const { data: savedStations } = useSavedStations();
-  const { data: playlists } = usePlaylists();
   const saveStation = useSaveStation();
   const unsaveStation = useUnsaveStation();
-  const addToPlaylist = useAddStationToPlaylist();
+  const pinStation = usePinStation();
+  const isPinned = useIsPinned(station.stationuuid);
   const { toast } = useToast();
 
   const isCurrentStation = currentStation?.stationuuid === station.stationuuid;
@@ -71,14 +68,14 @@ export function StationCard({ station, showRemove, onRemove }: StationCardProps)
     }
   };
 
-  const handleAddToPlaylist = async (playlistId: string) => {
+  const handlePinStation = async (isGoTo = false) => {
     try {
-      await addToPlaylist.mutateAsync({ playlistId, station });
-      toast({ title: 'Added to playlist!' });
+      await pinStation.mutateAsync({ station, isGoTo });
+      toast({ title: isGoTo ? 'Added to go-to stations!' : 'Station pinned!' });
     } catch {
       toast({
         title: 'Error',
-        description: 'Station may already be in this playlist',
+        description: 'Failed to pin station',
         variant: 'destructive',
       });
     }
@@ -135,12 +132,10 @@ export function StationCard({ station, showRemove, onRemove }: StationCardProps)
               {station.bitrate ? ` • ${station.bitrate} kbps` : ''}
             </p>
             
-            {/* Energy meter */}
             <div className="mt-1">
               <EnergyMeter stationUuid={station.stationuuid} size="sm" />
             </div>
             
-            {/* Tags */}
             <div className="flex flex-wrap gap-1 mt-1">
               {tags.map((tag) => (
                 <span
@@ -170,24 +165,14 @@ export function StationCard({ station, showRemove, onRemove }: StationCardProps)
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                {playlists && playlists.length > 0 && (
-                  <DropdownMenuSub>
-                    <DropdownMenuSubTrigger>
-                      <ListPlus className="w-4 h-4 mr-2" />
-                      Add to Playlist
-                    </DropdownMenuSubTrigger>
-                    <DropdownMenuSubContent>
-                      {playlists.map((playlist) => (
-                        <DropdownMenuItem
-                          key={playlist.id}
-                          onClick={() => handleAddToPlaylist(playlist.id)}
-                        >
-                          {playlist.name}
-                        </DropdownMenuItem>
-                      ))}
-                    </DropdownMenuSubContent>
-                  </DropdownMenuSub>
-                )}
+                <DropdownMenuItem onClick={() => handlePinStation(false)} disabled={isPinned}>
+                  <Pin className="w-4 h-4 mr-2" />
+                  {isPinned ? 'Already Pinned' : 'Pin to Library'}
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handlePinStation(true)}>
+                  <Star className="w-4 h-4 mr-2" />
+                  Add to Go-To
+                </DropdownMenuItem>
                 {showRemove && onRemove && (
                   <DropdownMenuItem onClick={onRemove} className="text-destructive">
                     Remove
@@ -198,7 +183,6 @@ export function StationCard({ station, showRemove, onRemove }: StationCardProps)
           </div>
         </div>
         
-        {/* Reaction bar - show when hovering or when user is logged in and station is playing */}
         {user && isCurrentStation && (
           <div className="mt-3 pt-3 border-t border-border">
             <ReactionBar 
