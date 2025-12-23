@@ -1,5 +1,7 @@
 import { useAuth } from '@/hooks/useAuth';
 import { useIsAdmin } from '@/hooks/useAdminRole';
+import { useProfile } from '@/hooks/useProfile';
+import { useSubscription } from '@/hooks/useSubscription';
 import { useNavigate, Link } from 'react-router-dom';
 import {
   Sidebar,
@@ -14,7 +16,7 @@ import {
   SidebarFooter,
 } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
-import { Radio, Compass, Heart, User, LogOut, Users, MessageSquare, Search, Pin, MapPin, Music, Shield } from 'lucide-react';
+import { Radio, Compass, Heart, User, LogOut, Users, MessageSquare, Search, Pin, MapPin, Music, Shield, BarChart3, Crown } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
 import { NotificationsPopover } from './NotificationsPopover';
 
@@ -26,7 +28,12 @@ interface DashboardSidebarProps {
 export function DashboardSidebar({ view, setView }: DashboardSidebarProps) {
   const { signOut, user } = useAuth();
   const { data: isAdmin } = useIsAdmin();
+  const { data: profile } = useProfile();
+  const { isSubscribed } = useSubscription();
   const navigate = useNavigate();
+
+  // Check if user has premium access (subscribed or verified by admin)
+  const hasPremiumAccess = isSubscribed || profile?.is_verified;
 
   const handleSignOut = async () => {
     await signOut();
@@ -118,6 +125,18 @@ export function DashboardSidebar({ view, setView }: DashboardSidebarProps) {
                   <Music className="w-4 h-4" />
                   <span>Music Identity</span>
                 </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <Link to="/premium-analytics">
+                  <SidebarMenuButton className={hasPremiumAccess ? 'text-primary' : ''}>
+                    {hasPremiumAccess ? (
+                      <BarChart3 className="w-4 h-4" />
+                    ) : (
+                      <Crown className="w-4 h-4" />
+                    )}
+                    <span>Premium Analytics</span>
+                  </SidebarMenuButton>
+                </Link>
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
