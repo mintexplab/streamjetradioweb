@@ -23,8 +23,8 @@ export default function Auth() {
   const { toast } = useToast();
 
   // Redirect if already logged in
-  if (user) {
-    navigate('/dashboard');
+  if (!loading && user) {
+    navigate('/dashboard', { replace: true });
     return null;
   }
 
