@@ -20,7 +20,7 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   const checkSubscription = useCallback(async () => {
-    if (!session?.access_token) {
+    if (!user) {
       setIsSubscribed(false);
       setSubscriptionEnd(null);
       setLoading(false);
@@ -28,36 +28,29 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
     }
 
     try {
-      const { data, error } = await supabase.functions.invoke('check-subscription', {
-        headers: {
-          Authorization: `Bearer ${session.access_token}`,
-        },
-      });
+      const { data, error } = await supabase.functions.invoke('check-subscription');
 
       if (error) throw error;
 
-      setIsSubscribed(data.subscribed);
-      setSubscriptionEnd(data.subscription_end);
+      setIsSubscribed(data?.subscribed || false);
+      setSubscriptionEnd(data?.subscription_end || null);
     } catch (error) {
       console.error('Error checking subscription:', error);
+      setIsSubscribed(false);
     } finally {
       setLoading(false);
     }
-  }, [session?.access_token]);
+  }, [user]);
 
   const startCheckout = async () => {
-    if (!session?.access_token) return;
+    if (!user) return;
 
     try {
-      const { data, error } = await supabase.functions.invoke('create-checkout', {
-        headers: {
-          Authorization: `Bearer ${session.access_token}`,
-        },
-      });
+      const { data, error } = await supabase.functions.invoke('create-checkout');
 
       if (error) throw error;
 
-      if (data.url) {
+      if (data?.url) {
         window.open(data.url, '_blank');
       }
     } catch (error) {
@@ -66,18 +59,14 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
   };
 
   const openCustomerPortal = async () => {
-    if (!session?.access_token) return;
+    if (!user) return;
 
     try {
-      const { data, error } = await supabase.functions.invoke('customer-portal', {
-        headers: {
-          Authorization: `Bearer ${session.access_token}`,
-        },
-      });
+      const { data, error } = await supabase.functions.invoke('customer-portal');
 
       if (error) throw error;
 
-      if (data.url) {
+      if (data?.url) {
         window.open(data.url, '_blank');
       }
     } catch (error) {
