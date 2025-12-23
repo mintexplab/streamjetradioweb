@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      active_listeners: {
+        Row: {
+          id: string
+          last_heartbeat: string
+          started_at: string
+          station_name: string
+          station_uuid: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          last_heartbeat?: string
+          started_at?: string
+          station_name: string
+          station_uuid: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          last_heartbeat?: string
+          started_at?: string
+          station_name?: string
+          station_uuid?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       playlist_follows: {
         Row: {
           followed_at: string
@@ -198,6 +225,66 @@ export type Database = {
         }
         Relationships: []
       }
+      station_moments: {
+        Row: {
+          created_at: string
+          created_by: string
+          expires_at: string
+          id: string
+          moment_name: string
+          station_name: string
+          station_uuid: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          expires_at?: string
+          id?: string
+          moment_name: string
+          station_name: string
+          station_uuid: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          expires_at?: string
+          id?: string
+          moment_name?: string
+          station_name?: string
+          station_uuid?: string
+        }
+        Relationships: []
+      }
+      station_reactions: {
+        Row: {
+          created_at: string
+          expires_at: string
+          id: string
+          reaction_type: Database["public"]["Enums"]["reaction_type"]
+          station_name: string
+          station_uuid: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          reaction_type: Database["public"]["Enums"]["reaction_type"]
+          station_name: string
+          station_uuid: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          reaction_type?: Database["public"]["Enums"]["reaction_type"]
+          station_name?: string
+          station_uuid?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
@@ -216,6 +303,51 @@ export type Database = {
         }
         Relationships: []
       }
+      user_station_stats: {
+        Row: {
+          created_at: string
+          crying_count: number
+          fire_count: number
+          id: string
+          last_listened_at: string | null
+          sleep_count: number
+          station_name: string
+          station_uuid: string
+          total_listen_time: number
+          updated_at: string
+          user_id: string
+          wave_count: number
+        }
+        Insert: {
+          created_at?: string
+          crying_count?: number
+          fire_count?: number
+          id?: string
+          last_listened_at?: string | null
+          sleep_count?: number
+          station_name: string
+          station_uuid: string
+          total_listen_time?: number
+          updated_at?: string
+          user_id: string
+          wave_count?: number
+        }
+        Update: {
+          created_at?: string
+          crying_count?: number
+          fire_count?: number
+          id?: string
+          last_listened_at?: string | null
+          sleep_count?: number
+          station_name?: string
+          station_uuid?: string
+          total_listen_time?: number
+          updated_at?: string
+          user_id?: string
+          wave_count?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -231,6 +363,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
+      reaction_type: "fire" | "wave" | "crying" | "sleep"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -359,6 +492,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "moderator", "user"],
+      reaction_type: ["fire", "wave", "crying", "sleep"],
     },
   },
 } as const

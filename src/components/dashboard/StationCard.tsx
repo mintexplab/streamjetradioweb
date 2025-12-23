@@ -15,6 +15,12 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Play, Pause, Heart, MoreHorizontal, ListPlus, Radio } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { ReactionBar } from './ReactionBar';
+import { EnergyMeter } from './EnergyMeter';
+import { LiveListenersBadge } from './LiveListenersBadge';
+import { VibePulseBadge } from './VibePulse';
+import { useAuth } from '@/hooks/useAuth';
+import { cn } from '@/lib/utils';
 
 interface StationCardProps {
   station: RadioStation;
@@ -23,6 +29,7 @@ interface StationCardProps {
 }
 
 export function StationCard({ station, showRemove, onRemove }: StationCardProps) {
+  const { user } = useAuth();
   const { currentStation, isPlaying, play, pause, resume } = useRadioPlayer();
   const { data: savedStations } = useSavedStations();
   const { data: playlists } = usePlaylists();
@@ -80,7 +87,10 @@ export function StationCard({ station, showRemove, onRemove }: StationCardProps)
   const tags = station.tags?.split(',').slice(0, 3) || [];
 
   return (
-    <Card className={`group transition-all hover:shadow-brand ${isCurrentStation ? 'ring-2 ring-primary' : ''}`}>
+    <Card className={cn(
+      'group transition-all hover:shadow-brand',
+      isCurrentStation && 'ring-2 ring-primary'
+    )}>
       <CardContent className="p-3 sm:p-4">
         <div className="flex gap-2 sm:gap-3">
           <div className="relative flex-shrink-0">
@@ -113,13 +123,24 @@ export function StationCard({ station, showRemove, onRemove }: StationCardProps)
           </div>
 
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold truncate text-sm sm:text-base" title={station.name}>
-              {station.name}
-            </h3>
+            <div className="flex items-center gap-2">
+              <h3 className="font-semibold truncate text-sm sm:text-base" title={station.name}>
+                {station.name}
+              </h3>
+              <LiveListenersBadge stationUuid={station.stationuuid} />
+              <VibePulseBadge stationUuid={station.stationuuid} />
+            </div>
             <p className="text-xs sm:text-sm text-muted-foreground truncate">
               {station.country}
               {station.bitrate ? ` • ${station.bitrate} kbps` : ''}
             </p>
+            
+            {/* Energy meter */}
+            <div className="mt-1">
+              <EnergyMeter stationUuid={station.stationuuid} size="sm" />
+            </div>
+            
+            {/* Tags */}
             <div className="flex flex-wrap gap-1 mt-1">
               {tags.map((tag) => (
                 <span
@@ -136,10 +157,10 @@ export function StationCard({ station, showRemove, onRemove }: StationCardProps)
             <Button
               size="icon"
               variant="ghost"
-              className={`w-8 h-8 sm:w-10 sm:h-10 ${isSaved ? 'text-streamjet-red' : ''}`}
+              className={cn('w-8 h-8 sm:w-10 sm:h-10', isSaved && 'text-streamjet-red')}
               onClick={handleSaveToggle}
             >
-              <Heart className={`w-4 h-4 ${isSaved ? 'fill-current' : ''}`} />
+              <Heart className={cn('w-4 h-4', isSaved && 'fill-current')} />
             </Button>
 
             <DropdownMenu>
@@ -176,6 +197,17 @@ export function StationCard({ station, showRemove, onRemove }: StationCardProps)
             </DropdownMenu>
           </div>
         </div>
+        
+        {/* Reaction bar - show when hovering or when user is logged in and station is playing */}
+        {user && isCurrentStation && (
+          <div className="mt-3 pt-3 border-t border-border">
+            <ReactionBar 
+              stationUuid={station.stationuuid} 
+              stationName={station.name}
+              compact
+            />
+          </div>
+        )}
       </CardContent>
     </Card>
   );
