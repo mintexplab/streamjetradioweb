@@ -13,46 +13,21 @@ import {
   SidebarFooter,
 } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
-import { Radio, Compass, Heart, ListMusic, User, LogOut, Plus } from 'lucide-react';
-import { Playlist, useCreatePlaylist } from '@/hooks/usePlaylists';
-import { useToast } from '@/hooks/use-toast';
+import { Radio, Compass, Heart, User, LogOut, Users, MessageSquare, Search, Pin } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
 
 interface DashboardSidebarProps {
   view: string;
-  setView: (view: 'discover' | 'saved' | 'playlist' | 'profile' | 'shared') => void;
-  playlists: Playlist[];
-  onSelectPlaylist: (id: string) => void;
+  setView: (view: 'discover' | 'saved' | 'feed' | 'friends' | 'search' | 'library' | 'profile') => void;
 }
 
-export function DashboardSidebar({ view, setView, playlists, onSelectPlaylist }: DashboardSidebarProps) {
+export function DashboardSidebar({ view, setView }: DashboardSidebarProps) {
   const { signOut, user } = useAuth();
   const navigate = useNavigate();
-  const createPlaylist = useCreatePlaylist();
-  const { toast } = useToast();
 
   const handleSignOut = async () => {
     await signOut();
     navigate('/');
-  };
-
-  const handleCreatePlaylist = async () => {
-    try {
-      const playlist = await createPlaylist.mutateAsync({
-        name: `My Playlist ${(playlists?.length || 0) + 1}`,
-      });
-      onSelectPlaylist(playlist.id);
-      toast({
-        title: 'Playlist created',
-        description: 'Your new playlist is ready!',
-      });
-    } catch {
-      toast({
-        title: 'Error',
-        description: 'Failed to create playlist',
-        variant: 'destructive',
-      });
-    }
   };
 
   return (
@@ -75,21 +50,27 @@ export function DashboardSidebar({ view, setView, playlists, onSelectPlaylist }:
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton
-                  isActive={view === 'discover'}
-                  onClick={() => setView('discover')}
-                >
+                <SidebarMenuButton isActive={view === 'discover'} onClick={() => setView('discover')}>
                   <Compass className="w-4 h-4" />
                   <span>Discover</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton
-                  isActive={view === 'saved'}
-                  onClick={() => setView('saved')}
-                >
+                <SidebarMenuButton isActive={view === 'feed'} onClick={() => setView('feed')}>
+                  <MessageSquare className="w-4 h-4" />
+                  <span>Feed</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton isActive={view === 'saved'} onClick={() => setView('saved')}>
                   <Heart className="w-4 h-4" />
                   <span>Saved Stations</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton isActive={view === 'library'} onClick={() => setView('library')}>
+                  <Pin className="w-4 h-4" />
+                  <span>Station Library</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
@@ -97,36 +78,21 @@ export function DashboardSidebar({ view, setView, playlists, onSelectPlaylist }:
         </SidebarGroup>
 
         <SidebarGroup>
-          <SidebarGroupLabel className="flex items-center justify-between">
-            <span>Playlists</span>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-6 w-6"
-              onClick={handleCreatePlaylist}
-              disabled={createPlaylist.isPending}
-            >
-              <Plus className="w-4 h-4" />
-            </Button>
-          </SidebarGroupLabel>
+          <SidebarGroupLabel>Social</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {playlists.map((playlist) => (
-                <SidebarMenuItem key={playlist.id}>
-                  <SidebarMenuButton
-                    isActive={view === 'playlist'}
-                    onClick={() => onSelectPlaylist(playlist.id)}
-                  >
-                    <ListMusic className="w-4 h-4" />
-                    <span className="truncate">{playlist.name}</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-              {playlists.length === 0 && (
-                <p className="text-sm text-muted-foreground px-3 py-2">
-                  No playlists yet
-                </p>
-              )}
+              <SidebarMenuItem>
+                <SidebarMenuButton isActive={view === 'friends'} onClick={() => setView('friends')}>
+                  <Users className="w-4 h-4" />
+                  <span>Friends</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton isActive={view === 'search'} onClick={() => setView('search')}>
+                  <Search className="w-4 h-4" />
+                  <span>Find Users</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -137,11 +103,7 @@ export function DashboardSidebar({ view, setView, playlists, onSelectPlaylist }:
           <User className="w-4 h-4" />
           <span className="truncate text-sm">{user?.email}</span>
         </SidebarMenuButton>
-        <Button
-          variant="ghost"
-          className="w-full justify-start text-muted-foreground"
-          onClick={handleSignOut}
-        >
+        <Button variant="ghost" className="w-full justify-start text-muted-foreground" onClick={handleSignOut}>
           <LogOut className="w-4 h-4 mr-2" />
           Sign Out
         </Button>
