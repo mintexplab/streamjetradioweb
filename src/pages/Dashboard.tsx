@@ -4,6 +4,7 @@ import { useTopStations, useSearchStations, useStationsByCountry, useStationsByT
 import { useSavedStations } from '@/hooks/useSavedStations';
 import { usePlaylists } from '@/hooks/usePlaylists';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
+import { MobileHeader } from '@/components/dashboard/MobileHeader';
 import { StationGrid } from '@/components/dashboard/StationGrid';
 import { PlayerBar } from '@/components/dashboard/PlayerBar';
 import { SearchBar } from '@/components/dashboard/SearchBar';
@@ -68,6 +69,7 @@ export default function Dashboard() {
           }}
         />
         <SidebarInset className="pb-24">
+          <MobileHeader />
           <SharedPlaylistView shareCode={shareCode} />
           <PlayerBar />
         </SidebarInset>
@@ -111,6 +113,7 @@ export default function Dashboard() {
         }}
       />
       <SidebarInset className="pb-20 sm:pb-24">
+        <MobileHeader />
         <div className="p-4 sm:p-6">
           {view === 'discover' && (
             <>
