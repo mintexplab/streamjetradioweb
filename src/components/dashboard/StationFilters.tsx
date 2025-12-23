@@ -42,9 +42,9 @@ export function StationFilters({ onFilterChange, activeFilter }: StationFiltersP
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3 sm:space-y-4">
       {/* Country Filter */}
-      <div className="flex items-center gap-3 flex-wrap">
+      <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
         <div className="flex items-center gap-2">
           <Globe className="w-4 h-4 text-muted-foreground" />
           <span className="text-sm font-medium">Country:</span>
@@ -57,7 +57,7 @@ export function StationFilters({ onFilterChange, activeFilter }: StationFiltersP
             }
           }}
         >
-          <SelectTrigger className="w-48">
+          <SelectTrigger className="w-full sm:w-48">
             <SelectValue placeholder="All Countries" />
           </SelectTrigger>
           <SelectContent className="max-h-64">
@@ -87,12 +87,12 @@ export function StationFilters({ onFilterChange, activeFilter }: StationFiltersP
           <Music className="w-4 h-4 text-muted-foreground" />
           <span className="text-sm font-medium">Genre:</span>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-1.5 sm:gap-2">
           {displayedTags.map((tag) => (
             <Badge
               key={tag}
               variant={activeFilter.type === 'tag' && activeFilter.value === tag ? 'default' : 'outline'}
-              className="cursor-pointer hover:bg-primary/20 transition-colors capitalize"
+              className="cursor-pointer hover:bg-primary/20 transition-colors capitalize text-xs sm:text-sm"
               onClick={() => {
                 if (activeFilter.type === 'tag' && activeFilter.value === tag) {
                   onFilterChange('none');
@@ -107,7 +107,7 @@ export function StationFilters({ onFilterChange, activeFilter }: StationFiltersP
           {!showAllTags && (
             <Badge
               variant="secondary"
-              className="cursor-pointer"
+              className="cursor-pointer text-xs sm:text-sm"
               onClick={() => setShowAllTags(true)}
             >
               +{POPULAR_TAGS.length - 9} more
@@ -116,7 +116,7 @@ export function StationFilters({ onFilterChange, activeFilter }: StationFiltersP
           {showAllTags && (
             <Badge
               variant="secondary"
-              className="cursor-pointer"
+              className="cursor-pointer text-xs sm:text-sm"
               onClick={() => setShowAllTags(false)}
             >
               Show less

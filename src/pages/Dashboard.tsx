@@ -110,8 +110,8 @@ export default function Dashboard() {
           setView('playlist');
         }}
       />
-      <SidebarInset className="pb-24">
-        <div className="p-6">
+      <SidebarInset className="pb-20 sm:pb-24">
+        <div className="p-4 sm:p-6">
           {view === 'discover' && (
             <>
               <SearchBar value={searchQuery} onChange={(v) => {
@@ -119,14 +119,14 @@ export default function Dashboard() {
                 if (v) setActiveFilter({ type: 'none' }); // Clear filter when searching
               }} />
               
-              <div className="mt-6">
+              <div className="mt-4 sm:mt-6">
                 <StationFilters 
                   onFilterChange={handleFilterChange} 
                   activeFilter={activeFilter} 
                 />
               </div>
 
-              <h2 className="text-2xl font-bold mb-4 mt-6">{title}</h2>
+              <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4 mt-4 sm:mt-6">{title}</h2>
               <StationGrid
                 stations={stations}
                 isLoading={isLoading}

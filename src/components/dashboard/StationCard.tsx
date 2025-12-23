@@ -81,42 +81,42 @@ export function StationCard({ station, showRemove, onRemove }: StationCardProps)
 
   return (
     <Card className={`group transition-all hover:shadow-brand ${isCurrentStation ? 'ring-2 ring-primary' : ''}`}>
-      <CardContent className="p-4">
-        <div className="flex gap-3">
+      <CardContent className="p-3 sm:p-4">
+        <div className="flex gap-2 sm:gap-3">
           <div className="relative flex-shrink-0">
             {station.favicon ? (
               <img
                 src={station.favicon}
                 alt={station.name}
-                className="w-16 h-16 rounded-lg object-cover bg-muted"
+                className="w-12 h-12 sm:w-16 sm:h-16 rounded-lg object-cover bg-muted"
                 onError={(e) => {
                   e.currentTarget.src = '';
                   e.currentTarget.onerror = null;
                 }}
               />
             ) : (
-              <div className="w-16 h-16 rounded-lg bg-gradient-brand flex items-center justify-center">
-                <Radio className="w-8 h-8 text-white" />
+              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-lg bg-gradient-brand flex items-center justify-center">
+                <Radio className="w-6 h-6 sm:w-8 sm:h-8 text-primary-foreground" />
               </div>
             )}
             <Button
               size="icon"
-              className="absolute inset-0 m-auto w-10 h-10 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+              className="absolute inset-0 m-auto w-8 h-8 sm:w-10 sm:h-10 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
               onClick={handlePlayPause}
             >
               {isCurrentStation && isPlaying ? (
-                <Pause className="w-5 h-5" />
+                <Pause className="w-4 h-4 sm:w-5 sm:h-5" />
               ) : (
-                <Play className="w-5 h-5 ml-0.5" />
+                <Play className="w-4 h-4 sm:w-5 sm:h-5 ml-0.5" />
               )}
             </Button>
           </div>
 
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold truncate" title={station.name}>
+            <h3 className="font-semibold truncate text-sm sm:text-base" title={station.name}>
               {station.name}
             </h3>
-            <p className="text-sm text-muted-foreground truncate">
+            <p className="text-xs sm:text-sm text-muted-foreground truncate">
               {station.country}
               {station.bitrate ? ` • ${station.bitrate} kbps` : ''}
             </p>
@@ -136,7 +136,7 @@ export function StationCard({ station, showRemove, onRemove }: StationCardProps)
             <Button
               size="icon"
               variant="ghost"
-              className={isSaved ? 'text-streamjet-red' : ''}
+              className={`w-8 h-8 sm:w-10 sm:h-10 ${isSaved ? 'text-streamjet-red' : ''}`}
               onClick={handleSaveToggle}
             >
               <Heart className={`w-4 h-4 ${isSaved ? 'fill-current' : ''}`} />
@@ -144,7 +144,7 @@ export function StationCard({ station, showRemove, onRemove }: StationCardProps)
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button size="icon" variant="ghost">
+                <Button size="icon" variant="ghost" className="w-8 h-8 sm:w-10 sm:h-10">
                   <MoreHorizontal className="w-4 h-4" />
                 </Button>
               </DropdownMenuTrigger>
