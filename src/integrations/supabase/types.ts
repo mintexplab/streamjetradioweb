@@ -14,16 +14,223 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      playlist_follows: {
+        Row: {
+          followed_at: string
+          id: string
+          playlist_id: string
+          user_id: string
+        }
+        Insert: {
+          followed_at?: string
+          id?: string
+          playlist_id: string
+          user_id: string
+        }
+        Update: {
+          followed_at?: string
+          id?: string
+          playlist_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "playlist_follows_playlist_id_fkey"
+            columns: ["playlist_id"]
+            isOneToOne: false
+            referencedRelation: "playlists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      playlist_stations: {
+        Row: {
+          added_at: string
+          id: string
+          playlist_id: string
+          position: number
+          station_country: string | null
+          station_favicon: string | null
+          station_name: string
+          station_tags: string | null
+          station_url: string
+          station_uuid: string
+        }
+        Insert: {
+          added_at?: string
+          id?: string
+          playlist_id: string
+          position?: number
+          station_country?: string | null
+          station_favicon?: string | null
+          station_name: string
+          station_tags?: string | null
+          station_url: string
+          station_uuid: string
+        }
+        Update: {
+          added_at?: string
+          id?: string
+          playlist_id?: string
+          position?: number
+          station_country?: string | null
+          station_favicon?: string | null
+          station_name?: string
+          station_tags?: string | null
+          station_url?: string
+          station_uuid?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "playlist_stations_playlist_id_fkey"
+            columns: ["playlist_id"]
+            isOneToOne: false
+            referencedRelation: "playlists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      playlists: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_public: boolean | null
+          name: string
+          share_code: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_public?: boolean | null
+          name: string
+          share_code?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_public?: boolean | null
+          name?: string
+          share_code?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          created_at: string
+          display_name: string | null
+          id: string
+          updated_at: string
+          user_id: string
+          username: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          updated_at?: string
+          user_id: string
+          username?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          updated_at?: string
+          user_id?: string
+          username?: string | null
+        }
+        Relationships: []
+      }
+      saved_stations: {
+        Row: {
+          created_at: string
+          id: string
+          station_bitrate: number | null
+          station_codec: string | null
+          station_country: string | null
+          station_favicon: string | null
+          station_name: string
+          station_tags: string | null
+          station_url: string
+          station_uuid: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          station_bitrate?: number | null
+          station_codec?: string | null
+          station_country?: string | null
+          station_favicon?: string | null
+          station_name: string
+          station_tags?: string | null
+          station_url: string
+          station_uuid: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          station_bitrate?: number | null
+          station_codec?: string | null
+          station_country?: string | null
+          station_favicon?: string | null
+          station_name?: string
+          station_tags?: string | null
+          station_url?: string
+          station_uuid?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "moderator" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +357,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "moderator", "user"],
+    },
   },
 } as const
