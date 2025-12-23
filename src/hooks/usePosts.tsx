@@ -11,7 +11,6 @@ export interface Post {
   station_name: string | null;
   created_at: string;
   updated_at: string;
-  // Joined from profiles
   profile?: {
     username: string | null;
     display_name: string | null;
@@ -25,27 +24,32 @@ export function usePosts(limit = 50) {
   const query = useQuery({
     queryKey: ['posts', limit],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // Fetch posts
+      const { data: posts, error: postsError } = await supabase
         .from('posts')
-        .select(`
-          *,
-          profile:profiles!posts_user_id_fkey(username, display_name, avatar_url)
-        `)
+        .select('*')
         .order('created_at', { ascending: false })
         .limit(limit);
 
-      if (error) {
-        // If the join fails, fetch without join
-        const { data: postsOnly, error: postsError } = await supabase
-          .from('posts')
-          .select('*')
-          .order('created_at', { ascending: false })
-          .limit(limit);
-        
-        if (postsError) throw postsError;
-        return postsOnly as Post[];
-      }
-      return data as Post[];
+      if (postsError) throw postsError;
+      if (!posts || posts.length === 0) return [] as Post[];
+
+      // Get unique user IDs
+      const userIds = [...new Set(posts.map(p => p.user_id))];
+
+      // Fetch profiles separately
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('user_id, username, display_name, avatar_url')
+        .in('user_id', userIds);
+
+      // Map profiles to posts
+      const profileMap = new Map(profiles?.map(p => [p.user_id, p]) || []);
+
+      return posts.map(post => ({
+        ...post,
+        profile: profileMap.get(post.user_id) || undefined,
+      })) as Post[];
     },
   });
 
@@ -141,7 +145,6 @@ export function useDeletePost() {
   });
 }
 
-// Get trending posts (most recent with activity)
 export function useTrendingPosts() {
   return useQuery({
     queryKey: ['posts', 'trending'],
