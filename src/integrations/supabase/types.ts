@@ -41,110 +41,127 @@ export type Database = {
         }
         Relationships: []
       }
-      playlist_follows: {
+      friendships: {
         Row: {
-          followed_at: string
+          addressee_id: string
+          created_at: string
           id: string
-          playlist_id: string
+          requester_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          addressee_id: string
+          created_at?: string
+          id?: string
+          requester_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          addressee_id?: string
+          created_at?: string
+          id?: string
+          requester_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      listening_sessions: {
+        Row: {
+          duration_seconds: number | null
+          ended_at: string | null
+          id: string
+          started_at: string
+          station_name: string
+          station_uuid: string
           user_id: string
         }
         Insert: {
-          followed_at?: string
+          duration_seconds?: number | null
+          ended_at?: string | null
           id?: string
-          playlist_id: string
+          started_at?: string
+          station_name: string
+          station_uuid: string
           user_id: string
         }
         Update: {
-          followed_at?: string
+          duration_seconds?: number | null
+          ended_at?: string | null
           id?: string
-          playlist_id?: string
+          started_at?: string
+          station_name?: string
+          station_uuid?: string
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "playlist_follows_playlist_id_fkey"
-            columns: ["playlist_id"]
-            isOneToOne: false
-            referencedRelation: "playlists"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
-      playlist_stations: {
+      pinned_stations: {
         Row: {
-          added_at: string
           id: string
-          playlist_id: string
-          position: number
+          is_go_to: boolean | null
+          pinned_at: string
           station_country: string | null
           station_favicon: string | null
           station_name: string
           station_tags: string | null
           station_url: string
           station_uuid: string
+          user_id: string
         }
         Insert: {
-          added_at?: string
           id?: string
-          playlist_id: string
-          position?: number
+          is_go_to?: boolean | null
+          pinned_at?: string
           station_country?: string | null
           station_favicon?: string | null
           station_name: string
           station_tags?: string | null
           station_url: string
           station_uuid: string
+          user_id: string
         }
         Update: {
-          added_at?: string
           id?: string
-          playlist_id?: string
-          position?: number
+          is_go_to?: boolean | null
+          pinned_at?: string
           station_country?: string | null
           station_favicon?: string | null
           station_name?: string
           station_tags?: string | null
           station_url?: string
           station_uuid?: string
+          user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "playlist_stations_playlist_id_fkey"
-            columns: ["playlist_id"]
-            isOneToOne: false
-            referencedRelation: "playlists"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
-      playlists: {
+      posts: {
         Row: {
+          content: string
           created_at: string
-          description: string | null
           id: string
-          is_public: boolean | null
-          name: string
-          share_code: string | null
+          station_name: string | null
+          station_uuid: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
+          content: string
           created_at?: string
-          description?: string | null
           id?: string
-          is_public?: boolean | null
-          name: string
-          share_code?: string | null
+          station_name?: string | null
+          station_uuid?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
+          content?: string
           created_at?: string
-          description?: string | null
           id?: string
-          is_public?: boolean | null
-          name?: string
-          share_code?: string | null
+          station_name?: string | null
+          station_uuid?: string | null
           updated_at?: string
           user_id?: string
         }
