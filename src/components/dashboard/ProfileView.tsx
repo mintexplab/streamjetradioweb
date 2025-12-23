@@ -10,7 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
-import { User, Save, Loader2, Upload, Copy, Check, ExternalLink, Share2 } from 'lucide-react';
+import { User, Save, Loader2, Upload, Copy, Check, ExternalLink, Share2, BadgeCheck } from 'lucide-react';
 import { ProfileReactionStats } from './ProfileReactionStats';
 import { CurrentlyListeningBadge } from './CurrentlyListeningBadge';
 import { ShareableStatsCard } from './ShareableStatsCard';
@@ -170,7 +170,12 @@ export function ProfileView() {
               />
             </div>
             <div className="text-center sm:text-left flex-1">
-              <CardTitle className="text-lg sm:text-xl">{profile?.display_name || user?.email}</CardTitle>
+              <CardTitle className="text-lg sm:text-xl flex items-center gap-2">
+                {profile?.display_name || user?.email}
+                {profile?.is_verified && (
+                  <BadgeCheck className="w-5 h-5 text-primary fill-primary/20" />
+                )}
+              </CardTitle>
               <CardDescription className="text-sm">{user?.email}</CardDescription>
               {username && (
                 <p className="text-sm text-primary mt-1">@{username}</p>

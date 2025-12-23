@@ -1,5 +1,6 @@
 import { useAuth } from '@/hooks/useAuth';
-import { useNavigate } from 'react-router-dom';
+import { useIsAdmin } from '@/hooks/useAdminRole';
+import { useNavigate, Link } from 'react-router-dom';
 import {
   Sidebar,
   SidebarContent,
@@ -13,7 +14,7 @@ import {
   SidebarFooter,
 } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
-import { Radio, Compass, Heart, User, LogOut, Users, MessageSquare, Search, Pin, MapPin, Music } from 'lucide-react';
+import { Radio, Compass, Heart, User, LogOut, Users, MessageSquare, Search, Pin, MapPin, Music, Shield } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
 import { NotificationsPopover } from './NotificationsPopover';
 
@@ -24,6 +25,7 @@ interface DashboardSidebarProps {
 
 export function DashboardSidebar({ view, setView }: DashboardSidebarProps) {
   const { signOut, user } = useAuth();
+  const { data: isAdmin } = useIsAdmin();
   const navigate = useNavigate();
 
   const handleSignOut = async () => {
@@ -123,6 +125,14 @@ export function DashboardSidebar({ view, setView }: DashboardSidebarProps) {
       </SidebarContent>
 
       <SidebarFooter className="p-4 space-y-2">
+        {isAdmin && (
+          <Link to="/admin">
+            <SidebarMenuButton className="w-full text-primary">
+              <Shield className="w-4 h-4" />
+              <span>Admin Dashboard</span>
+            </SidebarMenuButton>
+          </Link>
+        )}
         <SidebarMenuButton onClick={() => setView('profile')}>
           <User className="w-4 h-4" />
           <span className="truncate text-sm">{user?.email}</span>

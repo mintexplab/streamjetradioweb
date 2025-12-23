@@ -11,6 +11,7 @@ import Dashboard from "./pages/Dashboard";
 import PublicProfile from "./pages/PublicProfile";
 import { StationPage } from "./pages/StationPage";
 import ArtistPage from "./pages/ArtistPage";
+import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
 import { useListenerPresence } from "./hooks/useActiveListeners";
 import { useFriendListeningNotifications } from "./hooks/useFriendListeningNotifications";
@@ -40,6 +41,7 @@ const App = () => (
                   <Route path="/station/:stationUuid" element={<StationPage />} />
                   <Route path="/profile/:handle" element={<PublicProfile />} />
                   <Route path="/artist/:artistId" element={<ArtistPage />} />
+                  <Route path="/admin" element={<AdminDashboard />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </BrowserRouter>
