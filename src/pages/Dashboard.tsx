@@ -4,6 +4,7 @@ import { useSearchStations, useStationsByTag, useStationsByCountry } from '@/hoo
 import { useSavedStations } from '@/hooks/useSavedStations';
 import { useStationsByGenres } from '@/hooks/useStationsByGenres';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
+import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
 import { StationRow } from '@/components/dashboard/StationRow';
 import { StationGrid } from '@/components/dashboard/StationGrid';
 import { PlayerBar } from '@/components/dashboard/PlayerBar';
@@ -16,7 +17,6 @@ import { UserSearch } from '@/components/dashboard/UserSearch';
 import { StationLibrary } from '@/components/dashboard/StationLibrary';
 import { NeighborhoodsView } from '@/components/dashboard/NeighborhoodsView';
 import { MusicIdentityEditor } from '@/components/dashboard/MusicIdentityEditor';
-import { MobileHeader } from '@/components/dashboard/MobileHeader';
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
 import { Navigate } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
@@ -81,7 +81,7 @@ export default function Dashboard() {
     <SidebarProvider>
       <DashboardSidebar view={view} setView={setView} />
       <SidebarInset className="pb-20 sm:pb-24">
-        <MobileHeader />
+        <DashboardHeader setView={setView} />
         <div className="p-4 sm:p-6 lg:p-8 max-w-[1600px]">
           <div key={view} className="animate-fade-in">
             {view === 'discover' && (

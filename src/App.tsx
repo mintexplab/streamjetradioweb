@@ -9,6 +9,7 @@ import { RadioPlayerProvider } from "@/hooks/useRadioPlayer";
 import { SubscriptionProvider } from "@/hooks/useSubscription";
 import { SpotifyAuthProvider } from "@/hooks/useSpotifyAuth";
 import { SpotifyPlayerProvider } from "@/hooks/useSpotifyPlayer";
+import Landing from "./pages/Landing";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import PublicProfile from "./pages/PublicProfile";
@@ -20,7 +21,6 @@ import NotFound from "./pages/NotFound";
 import { useListenerPresence } from "./hooks/useActiveListeners";
 import { useFriendListeningNotifications } from "./hooks/useFriendListeningNotifications";
 
-// Component to handle presence tracking and friend listening notifications
 function PresenceTracker({ children }: { children: React.ReactNode }) {
   useListenerPresence();
   useFriendListeningNotifications();
@@ -43,9 +43,9 @@ const App = () => (
                     <Sonner />
                     <BrowserRouter>
                       <Routes>
-                        <Route path="/" element={<Auth />} />
+                        <Route path="/" element={<Landing />} />
+                        <Route path="/auth" element={<Auth />} />
                         <Route path="/player" element={<Dashboard />} />
-                        {/* Redirect old /dashboard to /player */}
                         <Route path="/dashboard" element={<Navigate to="/player" replace />} />
                         <Route path="/station/:stationUuid" element={<StationPage />} />
                         <Route path="/profile/:handle" element={<PublicProfile />} />

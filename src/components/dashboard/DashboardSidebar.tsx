@@ -14,9 +14,7 @@ import {
   SidebarMenuItem,
   SidebarFooter,
 } from '@/components/ui/sidebar';
-import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Compass, Heart, User, LogOut, Users, Search, Pin, Music, Shield, BarChart3 } from 'lucide-react';
+import { Compass, Heart, Users, Search, Pin, Music, Shield, BarChart3 } from 'lucide-react';
 import streamjetLogo from '@/assets/streamjet-logo.png';
 
 interface DashboardSidebarProps {
@@ -25,18 +23,11 @@ interface DashboardSidebarProps {
 }
 
 export function DashboardSidebar({ view, setView }: DashboardSidebarProps) {
-  const { signOut, user } = useAuth();
   const { data: isAdmin } = useIsAdmin();
   const { data: profile } = useProfile();
   const { isSubscribed } = useSubscription();
-  const navigate = useNavigate();
 
   const hasPremiumAccess = isSubscribed || profile?.is_verified;
-
-  const handleSignOut = async () => {
-    await signOut();
-    navigate('/');
-  };
 
   const navItems = [
     { id: 'discover' as const, icon: Compass, label: 'Discover' },
@@ -52,8 +43,8 @@ export function DashboardSidebar({ view, setView }: DashboardSidebarProps) {
 
   return (
     <Sidebar className="border-r-0">
-      <SidebarHeader className="p-5 pb-2">
-        <img src={streamjetLogo} alt="StreamJet" className="h-7 w-auto object-contain" />
+      <SidebarHeader className="p-5 pb-4">
+        <img src={streamjetLogo} alt="StreamJet" className="h-12 w-auto object-contain object-left" />
       </SidebarHeader>
 
       <SidebarContent className="px-2">
@@ -108,7 +99,7 @@ export function DashboardSidebar({ view, setView }: DashboardSidebarProps) {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="p-3 space-y-1">
+      <SidebarFooter className="p-3">
         {isAdmin && (
           <Link to="/admin">
             <SidebarMenuButton className="w-full h-9 rounded-md text-sm text-primary">
@@ -117,29 +108,6 @@ export function DashboardSidebar({ view, setView }: DashboardSidebarProps) {
             </SidebarMenuButton>
           </Link>
         )}
-        <SidebarMenuButton
-          onClick={() => setView('profile')}
-          className="w-full h-10 rounded-md"
-        >
-          <Avatar className="w-6 h-6">
-            <AvatarImage src={profile?.avatar_url || ''} />
-            <AvatarFallback className="bg-accent text-xs">
-              <User className="w-3 h-3" />
-            </AvatarFallback>
-          </Avatar>
-          <span className="truncate text-sm font-medium">
-            {profile?.display_name || profile?.username || user?.email?.split('@')[0]}
-          </span>
-        </SidebarMenuButton>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="w-full justify-start text-muted-foreground h-8 text-xs"
-          onClick={handleSignOut}
-        >
-          <LogOut className="w-3.5 h-3.5 mr-2" />
-          Log out
-        </Button>
       </SidebarFooter>
     </Sidebar>
   );
