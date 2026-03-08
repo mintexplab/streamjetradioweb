@@ -8,7 +8,6 @@ import { StationRow } from '@/components/dashboard/StationRow';
 import { StationGrid } from '@/components/dashboard/StationGrid';
 import { PlayerBar } from '@/components/dashboard/PlayerBar';
 import { SearchBar } from '@/components/dashboard/SearchBar';
-import { StationFilters } from '@/components/dashboard/StationFilters';
 import { ProfileView } from '@/components/dashboard/ProfileView';
 import { SavedStationsView } from '@/components/dashboard/SavedStationsView';
 import { PostFeed } from '@/components/dashboard/PostFeed';
@@ -21,7 +20,6 @@ import { MobileHeader } from '@/components/dashboard/MobileHeader';
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
 import { Navigate } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
-import { cn } from '@/lib/utils';
 
 type View = 'discover' | 'saved' | 'feed' | 'friends' | 'search' | 'library' | 'neighborhoods' | 'identity' | 'profile';
 type FilterType = { type: 'country' | 'tag' | 'none'; value?: string };
@@ -85,21 +83,18 @@ export default function Dashboard() {
       <SidebarInset className="pb-20 sm:pb-24">
         <MobileHeader />
         <div className="p-4 sm:p-6 lg:p-8 max-w-[1600px]">
-          {/* View content with transition */}
           <div key={view} className="animate-fade-in">
             {view === 'discover' && (
               <div className="space-y-8">
-                <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                  <SearchBar
-                    value={searchQuery}
-                    onChange={(v) => {
-                      setSearchQuery(v);
-                      if (v) setActiveFilter({ type: 'none' });
-                    }}
-                  />
-                </div>
-
-                <StationFilters onFilterChange={handleFilterChange} activeFilter={activeFilter} />
+                <SearchBar
+                  value={searchQuery}
+                  onChange={(v) => {
+                    setSearchQuery(v);
+                    if (v) setActiveFilter({ type: 'none' });
+                  }}
+                  onFilterChange={handleFilterChange}
+                  activeFilter={activeFilter}
+                />
 
                 {isFilterActive ? (
                   <div className="animate-fade-in">
@@ -113,15 +108,13 @@ export default function Dashboard() {
                 ) : (
                   <div className="space-y-8">
                     {genreRows.map((row, i) => (
-                      <div key={row.label} style={{ animationDelay: `${i * 50}ms` }} className="animate-fade-in">
+                      <div key={row.label} style={{ animationDelay: `${i * 60}ms` }} className="animate-fade-in">
                         <StationRow
                           title={row.label}
                           stations={row.stations}
                           isLoading={row.isLoading}
                           onSeeAll={() => {
-                            if (row.tag) {
-                              handleFilterChange('tag', row.tag);
-                            }
+                            if (row.tag) handleFilterChange('tag', row.tag);
                           }}
                         />
                       </div>
