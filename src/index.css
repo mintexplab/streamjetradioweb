@@ -10,7 +10,7 @@
     --card-foreground: 0 0% 5%;
     --popover: 0 0% 97%;
     --popover-foreground: 0 0% 5%;
-    --primary: 142 50% 45%;
+    --primary: 280 70% 55%;
     --primary-foreground: 0 0% 100%;
     --secondary: 0 0% 92%;
     --secondary-foreground: 0 0% 20%;
@@ -22,17 +22,17 @@
     --destructive-foreground: 0 0% 100%;
     --border: 0 0% 88%;
     --input: 0 0% 88%;
-    --ring: 142 50% 45%;
+    --ring: 280 70% 55%;
     --radius: 0.5rem;
 
     --sidebar-background: 0 0% 96%;
     --sidebar-foreground: 0 0% 20%;
-    --sidebar-primary: 142 50% 45%;
+    --sidebar-primary: 280 70% 55%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 0 0% 92%;
     --sidebar-accent-foreground: 0 0% 15%;
     --sidebar-border: 0 0% 88%;
-    --sidebar-ring: 142 50% 45%;
+    --sidebar-ring: 280 80% 60%;
   }
 
   .dark {
@@ -42,8 +42,8 @@
     --card-foreground: 0 0% 92%;
     --popover: 0 0% 7%;
     --popover-foreground: 0 0% 92%;
-    --primary: 142 70% 45%;
-    --primary-foreground: 0 0% 0%;
+    --primary: 280 80% 60%;
+    --primary-foreground: 0 0% 100%;
     --secondary: 0 0% 12%;
     --secondary-foreground: 0 0% 80%;
     --muted: 0 0% 10%;
@@ -54,12 +54,12 @@
     --destructive-foreground: 0 0% 100%;
     --border: 0 0% 14%;
     --input: 0 0% 14%;
-    --ring: 142 70% 45%;
+    --ring: 280 80% 60%;
 
     --sidebar-background: 0 0% 3%;
     --sidebar-foreground: 0 0% 85%;
-    --sidebar-primary: 142 70% 45%;
-    --sidebar-primary-foreground: 0 0% 0%;
+    --sidebar-primary: 280 80% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 0 0% 10%;
     --sidebar-accent-foreground: 0 0% 90%;
     --sidebar-border: 0 0% 10%;
@@ -80,22 +80,22 @@
 
 @layer utilities {
   .text-gradient-brand {
-    background: linear-gradient(135deg, hsl(142 70% 45%), hsl(160 60% 40%));
+    background: linear-gradient(135deg, hsl(330 80% 60%), hsl(280 80% 60%));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
 
   .bg-gradient-brand {
-    background: linear-gradient(135deg, hsl(142 70% 45%), hsl(160 60% 40%));
+    background: linear-gradient(135deg, hsl(330 80% 60%), hsl(280 80% 60%));
   }
 
   .shadow-brand {
-    box-shadow: 0 4px 20px -4px hsl(142 70% 45% / 0.15);
+    box-shadow: 0 4px 20px -4px hsl(300 70% 50% / 0.2);
   }
 
   .glow-brand {
-    box-shadow: 0 0 30px hsl(142 70% 45% / 0.2);
+    box-shadow: 0 0 30px hsl(300 70% 50% / 0.25);
   }
 
   .bg-gradient-card {
