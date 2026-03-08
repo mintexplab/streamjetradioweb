@@ -1,22 +1,9 @@
 import { RadioStation } from '@/hooks/useRadioStations';
 import { useRadioPlayer } from '@/hooks/useRadioPlayer';
 import { useSavedStations, useSaveStation, useUnsaveStation } from '@/hooks/useSavedStations';
-import { usePinStation, useIsPinned } from '@/hooks/usePinnedStations';
-import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Play, Pause, Heart, MoreHorizontal, Pin, Radio, Star } from 'lucide-react';
+import { Play, Pause, Heart, Radio } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { ReactionBar } from './ReactionBar';
-import { EnergyMeter } from './EnergyMeter';
-import { LiveListenersBadge } from './LiveListenersBadge';
-import { VibePulseBadge } from './VibePulse';
-import { useAuth } from '@/hooks/useAuth';
 import { cn } from '@/lib/utils';
 
 interface StationCardProps {
@@ -26,13 +13,10 @@ interface StationCardProps {
 }
 
 export function StationCard({ station, showRemove, onRemove }: StationCardProps) {
-  const { user } = useAuth();
   const { currentStation, isPlaying, play, pause, resume } = useRadioPlayer();
   const { data: savedStations } = useSavedStations();
   const saveStation = useSaveStation();
   const unsaveStation = useUnsaveStation();
-  const pinStation = usePinStation();
-  const isPinned = useIsPinned(station.stationuuid);
   const { toast } = useToast();
 
   const isCurrentStation = currentStation?.stationuuid === station.stationuuid;
@@ -40,159 +24,87 @@ export function StationCard({ station, showRemove, onRemove }: StationCardProps)
 
   const handlePlayPause = () => {
     if (isCurrentStation) {
-      if (isPlaying) {
-        pause();
-      } else {
-        resume();
-      }
+      isPlaying ? pause() : resume();
     } else {
       play(station);
     }
   };
 
-  const handleSaveToggle = async () => {
+  const handleSaveToggle = async (e: React.MouseEvent) => {
+    e.stopPropagation();
     try {
       if (isSaved) {
         await unsaveStation.mutateAsync(station.stationuuid);
-        toast({ title: 'Station removed from saved' });
       } else {
         await saveStation.mutateAsync(station);
-        toast({ title: 'Station saved!' });
+        toast({ title: 'Added to Liked Stations' });
       }
     } catch {
-      toast({
-        title: 'Error',
-        description: 'Failed to update saved stations',
-        variant: 'destructive',
-      });
+      toast({ title: 'Error', variant: 'destructive' });
     }
   };
 
-  const handlePinStation = async (isGoTo = false) => {
-    try {
-      await pinStation.mutateAsync({ station, isGoTo });
-      toast({ title: isGoTo ? 'Added to go-to stations!' : 'Station pinned!' });
-    } catch {
-      toast({
-        title: 'Error',
-        description: 'Failed to pin station',
-        variant: 'destructive',
-      });
-    }
-  };
-
-  const tags = station.tags?.split(',').slice(0, 3) || [];
+  const tags = station.tags?.split(',').slice(0, 2) || [];
 
   return (
-    <Card className={cn(
-      'group transition-all hover:shadow-brand',
-      isCurrentStation && 'ring-2 ring-primary'
-    )}>
-      <CardContent className="p-3 sm:p-4">
-        <div className="flex gap-2 sm:gap-3">
-          <div className="relative flex-shrink-0">
-            {station.favicon ? (
-              <img
-                src={station.favicon}
-                alt={station.name}
-                className="w-12 h-12 sm:w-16 sm:h-16 rounded-lg object-cover bg-muted"
-                onError={(e) => {
-                  e.currentTarget.src = '';
-                  e.currentTarget.onerror = null;
-                }}
-              />
+    <div
+      className={cn(
+        'group relative rounded-md p-3 transition-all cursor-pointer',
+        'bg-card hover:bg-accent/60',
+        isCurrentStation && 'ring-1 ring-primary/50 bg-accent/40'
+      )}
+      onClick={handlePlayPause}
+    >
+      <div className="flex items-center gap-3">
+        <div className="relative flex-shrink-0">
+          {station.favicon ? (
+            <img
+              src={station.favicon}
+              alt={station.name}
+              className="w-12 h-12 rounded object-cover bg-muted"
+              onError={(e) => {
+                e.currentTarget.src = '';
+                e.currentTarget.onerror = null;
+              }}
+            />
+          ) : (
+            <div className="w-12 h-12 rounded bg-accent flex items-center justify-center">
+              <Radio className="w-5 h-5 text-muted-foreground" />
+            </div>
+          )}
+          <div className={cn(
+            'absolute inset-0 flex items-center justify-center rounded bg-black/50',
+            'opacity-0 group-hover:opacity-100 transition-opacity',
+            isCurrentStation && isPlaying && 'opacity-100'
+          )}>
+            {isCurrentStation && isPlaying ? (
+              <Pause className="w-5 h-5 text-white" />
             ) : (
-              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-lg bg-gradient-brand flex items-center justify-center">
-                <Radio className="w-6 h-6 sm:w-8 sm:h-8 text-primary-foreground" />
-              </div>
+              <Play className="w-5 h-5 text-white ml-0.5" />
             )}
-            <Button
-              size="icon"
-              className="absolute inset-0 m-auto w-8 h-8 sm:w-10 sm:h-10 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-              onClick={handlePlayPause}
-            >
-              {isCurrentStation && isPlaying ? (
-                <Pause className="w-4 h-4 sm:w-5 sm:h-5" />
-              ) : (
-                <Play className="w-4 h-4 sm:w-5 sm:h-5 ml-0.5" />
-              )}
-            </Button>
-          </div>
-
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2">
-              <h3 className="font-semibold truncate text-sm sm:text-base" title={station.name}>
-                {station.name}
-              </h3>
-              <LiveListenersBadge stationUuid={station.stationuuid} />
-              <VibePulseBadge stationUuid={station.stationuuid} />
-            </div>
-            <p className="text-xs sm:text-sm text-muted-foreground truncate">
-              {station.country}
-              {station.bitrate ? ` • ${station.bitrate} kbps` : ''}
-            </p>
-            
-            <div className="mt-1">
-              <EnergyMeter stationUuid={station.stationuuid} size="sm" />
-            </div>
-            
-            <div className="flex flex-wrap gap-1 mt-1">
-              {tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="text-xs px-1.5 py-0.5 bg-muted rounded-full text-muted-foreground"
-                >
-                  {tag.trim()}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-1">
-            <Button
-              size="icon"
-              variant="ghost"
-              className={cn('w-8 h-8 sm:w-10 sm:h-10', isSaved && 'text-streamjet-red')}
-              onClick={handleSaveToggle}
-            >
-              <Heart className={cn('w-4 h-4', isSaved && 'fill-current')} />
-            </Button>
-
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button size="icon" variant="ghost" className="w-8 h-8 sm:w-10 sm:h-10">
-                  <MoreHorizontal className="w-4 h-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => handlePinStation(false)} disabled={isPinned}>
-                  <Pin className="w-4 h-4 mr-2" />
-                  {isPinned ? 'Already Pinned' : 'Pin to Library'}
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handlePinStation(true)}>
-                  <Star className="w-4 h-4 mr-2" />
-                  Add to Go-To
-                </DropdownMenuItem>
-                {showRemove && onRemove && (
-                  <DropdownMenuItem onClick={onRemove} className="text-destructive">
-                    Remove
-                  </DropdownMenuItem>
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
           </div>
         </div>
-        
-        {user && isCurrentStation && (
-          <div className="mt-3 pt-3 border-t border-border">
-            <ReactionBar 
-              stationUuid={station.stationuuid} 
-              stationName={station.name}
-              compact
-            />
-          </div>
-        )}
-      </CardContent>
-    </Card>
+
+        <div className="flex-1 min-w-0">
+          <h3 className="font-medium text-sm truncate">{station.name}</h3>
+          <p className="text-xs text-muted-foreground truncate mt-0.5">
+            {station.country}
+            {tags.length > 0 && ` · ${tags.map(t => t.trim()).join(', ')}`}
+          </p>
+        </div>
+
+        <Button
+          size="icon"
+          variant="ghost"
+          className={cn(
+            'w-8 h-8 opacity-0 group-hover:opacity-100 transition-opacity',
+            isSaved && 'opacity-100 text-primary'
+          )}
+          onClick={handleSaveToggle}
+        >
+          <Heart className={cn('w-4 h-4', isSaved && 'fill-current')} />
+        </Button>
+      </div>
+    </div>
   );
 }

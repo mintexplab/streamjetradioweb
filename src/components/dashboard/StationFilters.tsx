@@ -1,64 +1,89 @@
 import { useState } from 'react';
-import { useCountries, useTags, useStationsByCountry, useStationsByTag } from '@/hooks/useRadioStations';
-import { Button } from '@/components/ui/button';
+import { useCountries } from '@/hooks/useRadioStations';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { Globe, Music, X } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { X } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface StationFiltersProps {
   onFilterChange: (type: 'country' | 'tag' | 'none', value?: string) => void;
   activeFilter: { type: 'country' | 'tag' | 'none'; value?: string };
 }
 
-// Country code to flag emoji
 function getCountryFlag(countryCode: string): string {
   if (!countryCode || countryCode.length !== 2) return '🌍';
-  const codePoints = countryCode
-    .toUpperCase()
-    .split('')
-    .map(char => 127397 + char.charCodeAt(0));
+  const codePoints = countryCode.toUpperCase().split('').map(char => 127397 + char.charCodeAt(0));
   return String.fromCodePoint(...codePoints);
 }
 
-const POPULAR_TAGS = [
-  'pop', 'rock', 'jazz', 'classical', 'hip hop', 'electronic', 
+const GENRES = [
+  'pop', 'rock', 'jazz', 'classical', 'hip hop', 'electronic',
   'country', 'r&b', 'latin', 'reggae', 'metal', 'indie',
   'folk', 'blues', 'soul', 'dance', 'ambient', 'news'
 ];
 
 export function StationFilters({ onFilterChange, activeFilter }: StationFiltersProps) {
-  const { data: countries, isLoading: loadingCountries } = useCountries();
-  const [showAllTags, setShowAllTags] = useState(false);
+  const { data: countries } = useCountries();
+  const [showAll, setShowAll] = useState(false);
 
   const topCountries = countries
     ?.filter(c => c.stationcount > 100)
     .sort((a, b) => b.stationcount - a.stationcount)
     .slice(0, 50) || [];
 
-  const displayedTags = showAllTags ? POPULAR_TAGS : POPULAR_TAGS.slice(0, 9);
-
-  const clearFilter = () => {
-    onFilterChange('none');
-  };
+  const visibleGenres = showAll ? GENRES : GENRES.slice(0, 10);
 
   return (
-    <div className="space-y-3 sm:space-y-4">
-      {/* Country Filter */}
-      <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
-        <div className="flex items-center gap-2">
-          <Globe className="w-4 h-4 text-muted-foreground" />
-          <span className="text-sm font-medium">Country:</span>
-        </div>
+    <div className="space-y-3">
+      {/* Genre chips */}
+      <div className="flex flex-wrap gap-2">
+        <button
+          onClick={() => onFilterChange('none')}
+          className={cn(
+            'px-3.5 py-1.5 rounded-full text-sm font-medium transition-colors',
+            activeFilter.type === 'none'
+              ? 'bg-foreground text-background'
+              : 'bg-secondary text-secondary-foreground hover:bg-accent'
+          )}
+        >
+          All
+        </button>
+        {visibleGenres.map((genre) => (
+          <button
+            key={genre}
+            onClick={() => {
+              if (activeFilter.type === 'tag' && activeFilter.value === genre) {
+                onFilterChange('none');
+              } else {
+                onFilterChange('tag', genre);
+              }
+            }}
+            className={cn(
+              'px-3.5 py-1.5 rounded-full text-sm font-medium transition-colors capitalize',
+              activeFilter.type === 'tag' && activeFilter.value === genre
+                ? 'bg-foreground text-background'
+                : 'bg-secondary text-secondary-foreground hover:bg-accent'
+            )}
+          >
+            {genre}
+          </button>
+        ))}
+        {!showAll && (
+          <button
+            onClick={() => setShowAll(true)}
+            className="px-3.5 py-1.5 rounded-full text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            More...
+          </button>
+        )}
+
+        {/* Country filter inline */}
         <Select
           value={activeFilter.type === 'country' ? activeFilter.value : ''}
-          onValueChange={(value) => {
-            if (value) {
-              onFilterChange('country', value);
-            }
-          }}
+          onValueChange={(value) => value && onFilterChange('country', value)}
         >
-          <SelectTrigger className="w-full sm:w-48">
-            <SelectValue placeholder="All Countries" />
+          <SelectTrigger className="w-auto h-8 rounded-full border-0 bg-secondary text-sm gap-1.5 px-3.5">
+            <SelectValue placeholder="🌍 Country" />
           </SelectTrigger>
           <SelectContent className="max-h-64">
             {topCountries.map((country) => (
@@ -66,7 +91,6 @@ export function StationFilters({ onFilterChange, activeFilter }: StationFiltersP
                 <span className="flex items-center gap-2">
                   <span>{getCountryFlag(country.iso_3166_1)}</span>
                   <span>{country.name}</span>
-                  <span className="text-muted-foreground text-xs">({country.stationcount})</span>
                 </span>
               </SelectItem>
             ))}
@@ -74,55 +98,15 @@ export function StationFilters({ onFilterChange, activeFilter }: StationFiltersP
         </Select>
 
         {activeFilter.type !== 'none' && (
-          <Button variant="ghost" size="sm" onClick={clearFilter}>
-            <X className="w-4 h-4 mr-1" />
-            Clear
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => onFilterChange('none')}
+            className="h-8 rounded-full text-xs px-2"
+          >
+            <X className="w-3 h-3" />
           </Button>
         )}
-      </div>
-
-      {/* Genre/Tag Filter */}
-      <div className="space-y-2">
-        <div className="flex items-center gap-2">
-          <Music className="w-4 h-4 text-muted-foreground" />
-          <span className="text-sm font-medium">Genre:</span>
-        </div>
-        <div className="flex flex-wrap gap-1.5 sm:gap-2">
-          {displayedTags.map((tag) => (
-            <Badge
-              key={tag}
-              variant={activeFilter.type === 'tag' && activeFilter.value === tag ? 'default' : 'outline'}
-              className="cursor-pointer hover:bg-primary/20 transition-colors capitalize text-xs sm:text-sm"
-              onClick={() => {
-                if (activeFilter.type === 'tag' && activeFilter.value === tag) {
-                  onFilterChange('none');
-                } else {
-                  onFilterChange('tag', tag);
-                }
-              }}
-            >
-              {tag}
-            </Badge>
-          ))}
-          {!showAllTags && (
-            <Badge
-              variant="secondary"
-              className="cursor-pointer text-xs sm:text-sm"
-              onClick={() => setShowAllTags(true)}
-            >
-              +{POPULAR_TAGS.length - 9} more
-            </Badge>
-          )}
-          {showAllTags && (
-            <Badge
-              variant="secondary"
-              className="cursor-pointer text-xs sm:text-sm"
-              onClick={() => setShowAllTags(false)}
-            >
-              Show less
-            </Badge>
-          )}
-        </div>
       </div>
     </div>
   );
