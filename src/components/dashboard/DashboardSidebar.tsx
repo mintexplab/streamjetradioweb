@@ -16,7 +16,8 @@ import {
 } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Radio, Compass, Heart, User, LogOut, Users, Search, Pin, Music, Shield, BarChart3 } from 'lucide-react';
+import { Compass, Heart, User, LogOut, Users, Search, Pin, Music, Shield, BarChart3 } from 'lucide-react';
+import streamjetLogo from '@/assets/streamjet-logo.png';
 
 interface DashboardSidebarProps {
   view: string;
@@ -52,12 +53,7 @@ export function DashboardSidebar({ view, setView }: DashboardSidebarProps) {
   return (
     <Sidebar className="border-r-0">
       <SidebarHeader className="p-5 pb-2">
-        <div className="flex items-center gap-2.5">
-          <div className="p-1.5 rounded-md bg-primary">
-            <Radio className="w-4 h-4 text-primary-foreground" />
-          </div>
-          <span className="font-bold text-lg tracking-tight">StreamJet</span>
-        </div>
+        <img src={streamjetLogo} alt="StreamJet" className="h-7 w-auto object-contain" />
       </SidebarHeader>
 
       <SidebarContent className="px-2">

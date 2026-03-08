@@ -7,13 +7,8 @@ const GENRE_CATEGORIES = [
   { label: 'Popular Right Now', tag: '', isTop: true },
   { label: 'Pop Hits', tag: 'pop' },
   { label: 'Rock', tag: 'rock' },
-  { label: 'Jazz & Blues', tag: 'jazz' },
   { label: 'Electronic & Dance', tag: 'electronic' },
-  { label: 'Hip Hop & R&B', tag: 'hip hop' },
-  { label: 'Classical', tag: 'classical' },
-  { label: 'Latin Vibes', tag: 'latin' },
-  { label: 'Country', tag: 'country' },
-  { label: 'Chill & Ambient', tag: 'ambient' },
+  { label: 'Jazz & Blues', tag: 'jazz' },
 ];
 
 export { GENRE_CATEGORIES };
