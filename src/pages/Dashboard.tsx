@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { useTopStations, useSearchStations, useStationsByCountry, useStationsByTag } from '@/hooks/useRadioStations';
+import { useSearchStations, useStationsByTag, useStationsByCountry } from '@/hooks/useRadioStations';
 import { useSavedStations } from '@/hooks/useSavedStations';
+import { useStationsByGenres } from '@/hooks/useStationsByGenres';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
+import { StationRow } from '@/components/dashboard/StationRow';
 import { StationGrid } from '@/components/dashboard/StationGrid';
 import { PlayerBar } from '@/components/dashboard/PlayerBar';
 import { SearchBar } from '@/components/dashboard/SearchBar';
@@ -19,6 +21,7 @@ import { MobileHeader } from '@/components/dashboard/MobileHeader';
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
 import { Navigate } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 type View = 'discover' | 'saved' | 'feed' | 'friends' | 'search' | 'library' | 'neighborhoods' | 'identity' | 'profile';
 type FilterType = { type: 'country' | 'tag' | 'none'; value?: string };
@@ -29,13 +32,13 @@ export default function Dashboard() {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState<FilterType>({ type: 'none' });
 
-  const { data: topStations, isLoading: loadingTop } = useTopStations(30);
-  const { data: searchResults, isLoading: loadingSearch } = useSearchStations(searchQuery, 50);
-  const { data: countryStations, isLoading: loadingCountry } = useStationsByCountry(
-    activeFilter.type === 'country' ? activeFilter.value || '' : '', 50
-  );
+  const genreRows = useStationsByGenres();
+  const { data: searchResults, isLoading: loadingSearch } = useSearchStations(searchQuery, 20);
   const { data: tagStations, isLoading: loadingTag } = useStationsByTag(
-    activeFilter.type === 'tag' ? activeFilter.value || '' : '', 50
+    activeFilter.type === 'tag' ? activeFilter.value || '' : '', 20
+  );
+  const { data: countryStations, isLoading: loadingCountry } = useStationsByCountry(
+    activeFilter.type === 'country' ? activeFilter.value || '' : '', 20
   );
   const { data: savedStations } = useSavedStations();
 
@@ -51,28 +54,30 @@ export default function Dashboard() {
     return <Navigate to="/" replace />;
   }
 
-  let stations = topStations || [];
-  let isLoading = loadingTop;
-  let title = 'Popular right now';
-
-  if (searchQuery) {
-    stations = searchResults || [];
-    isLoading = loadingSearch;
-    title = `Results for "${searchQuery}"`;
-  } else if (activeFilter.type === 'country' && activeFilter.value) {
-    stations = countryStations || [];
-    isLoading = loadingCountry;
-    title = `Stations in ${activeFilter.value}`;
-  } else if (activeFilter.type === 'tag' && activeFilter.value) {
-    stations = tagStations || [];
-    isLoading = loadingTag;
-    title = `${activeFilter.value.charAt(0).toUpperCase() + activeFilter.value.slice(1)}`;
-  }
-
   const handleFilterChange = (type: 'country' | 'tag' | 'none', value?: string) => {
     setActiveFilter({ type, value });
     setSearchQuery('');
   };
+
+  const isFilterActive = searchQuery || activeFilter.type !== 'none';
+
+  let filteredStations: any[] = [];
+  let filteredLoading = false;
+  let filteredTitle = '';
+
+  if (searchQuery) {
+    filteredStations = searchResults || [];
+    filteredLoading = loadingSearch;
+    filteredTitle = `Results for "${searchQuery}"`;
+  } else if (activeFilter.type === 'tag' && activeFilter.value) {
+    filteredStations = tagStations || [];
+    filteredLoading = loadingTag;
+    filteredTitle = activeFilter.value.charAt(0).toUpperCase() + activeFilter.value.slice(1);
+  } else if (activeFilter.type === 'country' && activeFilter.value) {
+    filteredStations = countryStations || [];
+    filteredLoading = loadingCountry;
+    filteredTitle = `Stations in ${activeFilter.value}`;
+  }
 
   return (
     <SidebarProvider>
@@ -80,38 +85,60 @@ export default function Dashboard() {
       <SidebarInset className="pb-20 sm:pb-24">
         <MobileHeader />
         <div className="p-4 sm:p-6 lg:p-8 max-w-[1600px]">
-          {view === 'discover' && (
-            <div className="space-y-6">
-              <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                <SearchBar
-                  value={searchQuery}
-                  onChange={(v) => {
-                    setSearchQuery(v);
-                    if (v) setActiveFilter({ type: 'none' });
-                  }}
-                />
-              </div>
+          {/* View content with transition */}
+          <div key={view} className="animate-fade-in">
+            {view === 'discover' && (
+              <div className="space-y-8">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                  <SearchBar
+                    value={searchQuery}
+                    onChange={(v) => {
+                      setSearchQuery(v);
+                      if (v) setActiveFilter({ type: 'none' });
+                    }}
+                  />
+                </div>
 
-              <StationFilters onFilterChange={handleFilterChange} activeFilter={activeFilter} />
+                <StationFilters onFilterChange={handleFilterChange} activeFilter={activeFilter} />
 
-              <div>
-                <h2 className="text-2xl sm:text-3xl font-bold tracking-tight mb-4">{title}</h2>
-                <StationGrid
-                  stations={stations}
-                  isLoading={isLoading}
-                  emptyMessage={searchQuery ? 'No stations found' : 'No stations available'}
-                />
+                {isFilterActive ? (
+                  <div className="animate-fade-in">
+                    <h2 className="text-2xl font-bold tracking-tight mb-4">{filteredTitle}</h2>
+                    <StationGrid
+                      stations={filteredStations}
+                      isLoading={filteredLoading}
+                      emptyMessage={searchQuery ? 'No stations found' : 'No stations available'}
+                    />
+                  </div>
+                ) : (
+                  <div className="space-y-8">
+                    {genreRows.map((row, i) => (
+                      <div key={row.label} style={{ animationDelay: `${i * 50}ms` }} className="animate-fade-in">
+                        <StationRow
+                          title={row.label}
+                          stations={row.stations}
+                          isLoading={row.isLoading}
+                          onSeeAll={() => {
+                            if (row.tag) {
+                              handleFilterChange('tag', row.tag);
+                            }
+                          }}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
-            </div>
-          )}
-          {view === 'feed' && <PostFeed />}
-          {view === 'saved' && <SavedStationsView stations={savedStations || []} />}
-          {view === 'library' && <StationLibrary />}
-          {view === 'friends' && <FriendsList />}
-          {view === 'search' && <UserSearch />}
-          {view === 'neighborhoods' && <NeighborhoodsView />}
-          {view === 'identity' && <MusicIdentityEditor />}
-          {view === 'profile' && <ProfileView />}
+            )}
+            {view === 'feed' && <PostFeed />}
+            {view === 'saved' && <SavedStationsView stations={savedStations || []} />}
+            {view === 'library' && <StationLibrary />}
+            {view === 'friends' && <FriendsList />}
+            {view === 'search' && <UserSearch />}
+            {view === 'neighborhoods' && <NeighborhoodsView />}
+            {view === 'identity' && <MusicIdentityEditor />}
+            {view === 'profile' && <ProfileView />}
+          </div>
         </div>
         <PlayerBar />
       </SidebarInset>
