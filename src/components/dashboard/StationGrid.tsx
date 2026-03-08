@@ -11,9 +11,9 @@ interface StationGridProps {
 export function StationGrid({ stations, isLoading, emptyMessage = 'No stations found' }: StationGridProps) {
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
         {Array.from({ length: 12 }).map((_, i) => (
-          <Skeleton key={i} className="h-32 rounded-lg" />
+          <Skeleton key={i} className="h-[72px] rounded-md" />
         ))}
       </div>
     );
@@ -21,14 +21,14 @@ export function StationGrid({ stations, isLoading, emptyMessage = 'No stations f
 
   if (stations.length === 0) {
     return (
-      <div className="text-center py-12">
-        <p className="text-muted-foreground">{emptyMessage}</p>
+      <div className="text-center py-16">
+        <p className="text-muted-foreground text-sm">{emptyMessage}</p>
       </div>
     );
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
       {stations.map((station) => (
         <StationCard key={station.stationuuid} station={station} />
       ))}

@@ -57,15 +57,6 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
-        // StreamJet brand colors
-        streamjet: {
-          red: "hsl(var(--streamjet-red))",
-          purple: "hsl(var(--streamjet-purple))",
-          blue: "hsl(var(--streamjet-blue))",
-          "red-muted": "hsl(var(--streamjet-red-muted))",
-          "purple-muted": "hsl(var(--streamjet-purple-muted))",
-          "blue-muted": "hsl(var(--streamjet-blue-muted))",
-        },
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -74,20 +65,12 @@ export default {
       },
       keyframes: {
         "accordion-down": {
-          from: {
-            height: "0",
-          },
-          to: {
-            height: "var(--radix-accordion-content-height)",
-          },
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
         },
         "accordion-up": {
-          from: {
-            height: "var(--radix-accordion-content-height)",
-          },
-          to: {
-            height: "0",
-          },
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
         },
       },
       animation: {
