@@ -26,6 +26,7 @@ interface SearchBarProps {
 export function SearchBar({ value, onChange, onFilterChange, activeFilter }: SearchBarProps) {
   const [expanded, setExpanded] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
+  const [animatingOut, setAnimatingOut] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const { data: countries } = useCountries();
@@ -40,7 +41,9 @@ export function SearchBar({ value, onChange, onFilterChange, activeFilter }: Sea
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-        if (!value && !hasActiveFilter) setExpanded(false);
+        if (!value && !hasActiveFilter) {
+          handleCollapse();
+        }
         setShowFilters(false);
       }
     };
@@ -48,10 +51,25 @@ export function SearchBar({ value, onChange, onFilterChange, activeFilter }: Sea
     return () => document.removeEventListener('mousedown', handler);
   }, [value, hasActiveFilter]);
 
+  const handleCollapse = () => {
+    if (!expanded) return;
+    setAnimatingOut(true);
+    setTimeout(() => {
+      setExpanded(false);
+      setAnimatingOut(false);
+    }, 400);
+  };
+
+  const handleExpand = () => {
+    setExpanded(true);
+    setAnimatingOut(false);
+    setTimeout(() => inputRef.current?.focus(), 150);
+  };
+
   const handleClear = () => {
     onChange('');
     onFilterChange('none');
-    setExpanded(false);
+    handleCollapse();
     setShowFilters(false);
   };
 
@@ -64,59 +82,58 @@ export function SearchBar({ value, onChange, onFilterChange, activeFilter }: Sea
   return (
     <div ref={containerRef} className="relative">
       <div className="flex items-center gap-2">
-        <div
-          className={cn(
-            'relative flex items-center transition-all duration-400 ease-[cubic-bezier(0.4,0,0.2,1)]',
-            expanded ? 'w-full max-w-lg' : 'w-10'
-          )}
-        >
-          {!expanded ? (
-            <button
-              onClick={() => { setExpanded(true); setTimeout(() => inputRef.current?.focus(), 100); }}
-              className="w-10 h-10 bg-secondary flex items-center justify-center hover:bg-accent transition-colors"
-            >
-              <Search className="w-4 h-4 text-muted-foreground" />
-            </button>
-          ) : (
-            <>
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
-              <input
-                ref={inputRef}
-                type="text"
-                placeholder="What do you want to listen to?"
-                value={value}
-                onChange={(e) => onChange(e.target.value)}
-                className={cn(
-                  'flex h-10 w-full bg-secondary pl-10 text-sm placeholder:text-muted-foreground',
-                  'outline-none transition-all duration-300 ease-out',
-                  'focus:ring-1 focus:ring-primary/40 focus:bg-accent',
-                  (value || hasActiveFilter) ? 'pr-20' : 'pr-4'
-                )}
-              />
-              <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
-                {(value || hasActiveFilter) && (
-                  <button
-                    onClick={handleClear}
-                    className="w-6 h-6 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    <X className="w-3.5 h-3.5" />
-                  </button>
-                )}
+        {!expanded && !animatingOut ? (
+          <button
+            onClick={handleExpand}
+            className="w-10 h-10 bg-secondary flex items-center justify-center hover:bg-accent transition-all duration-200 hover:scale-105 active:scale-95"
+          >
+            <Search className="w-4 h-4 text-muted-foreground" />
+          </button>
+        ) : (
+          <div
+            className={cn(
+              'relative flex items-center w-full max-w-lg',
+              expanded && !animatingOut && 'animate-expand-width',
+              animatingOut && 'animate-collapse-width'
+            )}
+          >
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+            <input
+              ref={inputRef}
+              type="text"
+              placeholder="Search stations..."
+              value={value}
+              onChange={(e) => onChange(e.target.value)}
+              className={cn(
+                'flex h-10 w-full bg-secondary pl-10 text-sm placeholder:text-muted-foreground',
+                'outline-none transition-colors duration-200',
+                'focus:ring-1 focus:ring-primary/40 focus:bg-accent',
+                (value || hasActiveFilter) ? 'pr-20' : 'pr-4'
+              )}
+            />
+            <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+              {(value || hasActiveFilter) && (
                 <button
-                  onClick={() => setShowFilters(!showFilters)}
-                  className={cn(
-                    'w-7 h-7 flex items-center justify-center transition-all duration-200',
-                    showFilters || hasActiveFilter
-                      ? 'bg-primary text-primary-foreground'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-accent'
-                  )}
+                  onClick={handleClear}
+                  className="w-6 h-6 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  <SlidersHorizontal className="w-3.5 h-3.5" />
+                  <X className="w-3.5 h-3.5" />
                 </button>
-              </div>
-            </>
-          )}
-        </div>
+              )}
+              <button
+                onClick={() => setShowFilters(!showFilters)}
+                className={cn(
+                  'w-7 h-7 flex items-center justify-center transition-all duration-200',
+                  showFilters || hasActiveFilter
+                    ? 'bg-primary text-primary-foreground'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                )}
+              >
+                <SlidersHorizontal className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </div>
+        )}
 
         {activeLabel && !showFilters && (
           <div className="flex items-center gap-1.5 px-3 py-1.5 bg-primary/15 text-primary text-xs font-medium capitalize animate-fade-in">
@@ -128,7 +145,7 @@ export function SearchBar({ value, onChange, onFilterChange, activeFilter }: Sea
         )}
       </div>
 
-      {showFilters && expanded && (
+      {showFilters && expanded && !animatingOut && (
         <div className="absolute top-12 left-0 right-0 max-w-lg z-50 animate-fade-in">
           <div className="bg-card border border-border p-4 shadow-lg shadow-black/10 space-y-4">
             <div>

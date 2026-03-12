@@ -11,7 +11,6 @@ import { PlayerBar } from '@/components/dashboard/PlayerBar';
 import { SearchBar } from '@/components/dashboard/SearchBar';
 import { ProfileView } from '@/components/dashboard/ProfileView';
 import { SavedStationsView } from '@/components/dashboard/SavedStationsView';
-import { UserSearch } from '@/components/dashboard/UserSearch';
 import { StationLibrary } from '@/components/dashboard/StationLibrary';
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
 import { Navigate } from 'react-router-dom';
@@ -73,6 +72,36 @@ export default function Dashboard() {
     filteredTitle = `Stations in ${activeFilter.value}`;
   }
 
+  // Search tab uses the same station search with SearchBar + StationGrid
+  const renderSearchView = () => (
+    <div className="space-y-8 animate-fade-in">
+      <SearchBar
+        value={searchQuery}
+        onChange={(v) => {
+          setSearchQuery(v);
+          if (v) setActiveFilter({ type: 'none' });
+        }}
+        onFilterChange={handleFilterChange}
+        activeFilter={activeFilter}
+      />
+      {isFilterActive ? (
+        <div className="animate-fade-in">
+          <h2 className="text-2xl font-bold tracking-tight mb-4">{filteredTitle}</h2>
+          <StationGrid
+            stations={filteredStations}
+            isLoading={filteredLoading}
+            emptyMessage={searchQuery ? 'No stations found' : 'No stations available'}
+          />
+        </div>
+      ) : (
+        <div className="text-center py-20 text-muted-foreground animate-fade-in">
+          <p className="text-lg font-medium">Search for stations</p>
+          <p className="text-sm mt-1">Find stations by name, genre, or country</p>
+        </div>
+      )}
+    </div>
+  );
+
   return (
     <SidebarProvider>
       <DashboardSidebar view={view} setView={setView} />
@@ -104,7 +133,7 @@ export default function Dashboard() {
                 ) : (
                   <div className="space-y-10">
                     {genreRows.map((row, i) => (
-                      <div key={row.label} style={{ animationDelay: `${i * 60}ms` }} className="animate-fade-in">
+                      <div key={row.label} style={{ animationDelay: `${i * 80}ms` }} className="animate-fade-in">
                         <StationRow
                           title={row.label}
                           stations={row.stations}
@@ -121,7 +150,7 @@ export default function Dashboard() {
             )}
             {view === 'saved' && <SavedStationsView stations={savedStations || []} />}
             {view === 'library' && <StationLibrary />}
-            {view === 'search' && <UserSearch />}
+            {view === 'search' && renderSearchView()}
             {view === 'profile' && <ProfileView />}
           </div>
         </div>
