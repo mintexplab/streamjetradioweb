@@ -92,7 +92,7 @@ serve(async (req) => {
       await supabaseAdmin
         .from('profiles')
         .update({ is_verified: true })
-        .eq('user_id', user.id);
+        .eq('user_id', userId);
     }
 
     return new Response(JSON.stringify({
