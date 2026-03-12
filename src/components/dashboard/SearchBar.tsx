@@ -37,7 +37,6 @@ export function SearchBar({ value, onChange, onFilterChange, activeFilter }: Sea
 
   const hasActiveFilter = activeFilter.type !== 'none';
 
-  // Close filters when clicking outside
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
@@ -64,7 +63,6 @@ export function SearchBar({ value, onChange, onFilterChange, activeFilter }: Sea
 
   return (
     <div ref={containerRef} className="relative">
-      {/* Search row */}
       <div className="flex items-center gap-2">
         <div
           className={cn(
@@ -75,7 +73,7 @@ export function SearchBar({ value, onChange, onFilterChange, activeFilter }: Sea
           {!expanded ? (
             <button
               onClick={() => { setExpanded(true); setTimeout(() => inputRef.current?.focus(), 100); }}
-              className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center hover:bg-accent transition-colors"
+              className="w-10 h-10 bg-secondary flex items-center justify-center hover:bg-accent transition-colors"
             >
               <Search className="w-4 h-4 text-muted-foreground" />
             </button>
@@ -89,7 +87,7 @@ export function SearchBar({ value, onChange, onFilterChange, activeFilter }: Sea
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
                 className={cn(
-                  'flex h-10 w-full rounded-full bg-secondary pl-10 text-sm placeholder:text-muted-foreground',
+                  'flex h-10 w-full bg-secondary pl-10 text-sm placeholder:text-muted-foreground',
                   'outline-none transition-all duration-300 ease-out',
                   'focus:ring-1 focus:ring-primary/40 focus:bg-accent',
                   (value || hasActiveFilter) ? 'pr-20' : 'pr-4'
@@ -99,7 +97,7 @@ export function SearchBar({ value, onChange, onFilterChange, activeFilter }: Sea
                 {(value || hasActiveFilter) && (
                   <button
                     onClick={handleClear}
-                    className="w-6 h-6 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+                    className="w-6 h-6 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
                   >
                     <X className="w-3.5 h-3.5" />
                   </button>
@@ -107,7 +105,7 @@ export function SearchBar({ value, onChange, onFilterChange, activeFilter }: Sea
                 <button
                   onClick={() => setShowFilters(!showFilters)}
                   className={cn(
-                    'w-7 h-7 rounded-full flex items-center justify-center transition-all duration-200',
+                    'w-7 h-7 flex items-center justify-center transition-all duration-200',
                     showFilters || hasActiveFilter
                       ? 'bg-primary text-primary-foreground'
                       : 'text-muted-foreground hover:text-foreground hover:bg-accent'
@@ -120,9 +118,8 @@ export function SearchBar({ value, onChange, onFilterChange, activeFilter }: Sea
           )}
         </div>
 
-        {/* Active filter badge */}
         {activeLabel && !showFilters && (
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/15 text-primary text-xs font-medium capitalize animate-fade-in">
+          <div className="flex items-center gap-1.5 px-3 py-1.5 bg-primary/15 text-primary text-xs font-medium capitalize animate-fade-in">
             {activeLabel}
             <button onClick={() => onFilterChange('none')} className="hover:text-foreground">
               <X className="w-3 h-3" />
@@ -131,13 +128,11 @@ export function SearchBar({ value, onChange, onFilterChange, activeFilter }: Sea
         )}
       </div>
 
-      {/* Filters dropdown */}
       {showFilters && expanded && (
         <div className="absolute top-12 left-0 right-0 max-w-lg z-50 animate-fade-in">
-          <div className="bg-card border border-border rounded-xl p-4 shadow-lg shadow-black/20 space-y-4">
-            {/* Genres */}
+          <div className="bg-card border border-border p-4 shadow-lg shadow-black/10 space-y-4">
             <div>
-              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Genre</p>
+              <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">Genre</p>
               <div className="flex flex-wrap gap-1.5">
                 {GENRES.map((genre) => (
                   <button
@@ -151,7 +146,7 @@ export function SearchBar({ value, onChange, onFilterChange, activeFilter }: Sea
                       }
                     }}
                     className={cn(
-                      'px-2.5 py-1 rounded-full text-xs font-medium transition-all duration-200 capitalize',
+                      'px-2.5 py-1 text-xs font-medium transition-all duration-200 capitalize',
                       activeFilter.type === 'tag' && activeFilter.value === genre
                         ? 'bg-primary text-primary-foreground'
                         : 'bg-secondary text-secondary-foreground hover:bg-accent'
@@ -163,14 +158,13 @@ export function SearchBar({ value, onChange, onFilterChange, activeFilter }: Sea
               </div>
             </div>
 
-            {/* Country */}
             <div>
-              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Country</p>
+              <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">Country</p>
               <Select
                 value={activeFilter.type === 'country' ? activeFilter.value : ''}
                 onValueChange={(val) => { if (val) { onFilterChange('country', val); onChange(''); } }}
               >
-                <SelectTrigger className="w-full h-8 rounded-lg border-border bg-secondary text-xs">
+                <SelectTrigger className="w-full h-8 border-border bg-secondary text-xs">
                   <SelectValue placeholder="Select a country..." />
                 </SelectTrigger>
                 <SelectContent className="max-h-64">

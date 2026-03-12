@@ -1,8 +1,6 @@
 import { RadioStation } from '@/hooks/useRadioStations';
 import { useRadioPlayer } from '@/hooks/useRadioPlayer';
-import { useSavedStations, useSaveStation, useUnsaveStation } from '@/hooks/useSavedStations';
 import { Play, Pause, Radio } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 
@@ -28,7 +26,6 @@ export function StationCard({ station }: StationCardProps) {
   };
 
   const handleNavigate = () => {
-    // Play it if not already playing, then navigate
     if (!isCurrentStation) play(station);
     navigate(`/station/${station.stationuuid}`);
   };
@@ -38,13 +35,12 @@ export function StationCard({ station }: StationCardProps) {
   return (
     <div
       className={cn(
-        'group relative rounded-lg p-3 transition-all duration-200 cursor-pointer',
+        'group relative p-3 transition-all duration-200 cursor-pointer',
         'bg-card hover:bg-accent/60',
       )}
       onClick={handleNavigate}
     >
-      {/* Square artwork */}
-      <div className="relative aspect-square rounded-md overflow-hidden mb-3 bg-muted shadow-md">
+      <div className="relative aspect-square overflow-hidden mb-3 bg-muted shadow-sm">
         {station.favicon ? (
           <img
             src={station.favicon}
@@ -61,11 +57,10 @@ export function StationCard({ station }: StationCardProps) {
           </div>
         )}
 
-        {/* Play button overlay */}
         <button
           onClick={handlePlayPause}
           className={cn(
-            'absolute bottom-2 right-2 w-12 h-12 rounded-full flex items-center justify-center',
+            'absolute bottom-2 right-2 w-11 h-11 flex items-center justify-center',
             'bg-primary text-primary-foreground shadow-lg shadow-black/30',
             'transition-all duration-200',
             'opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0',
@@ -80,7 +75,7 @@ export function StationCard({ station }: StationCardProps) {
         </button>
       </div>
 
-      <h3 className="font-semibold text-sm truncate">{station.name}</h3>
+      <h3 className="font-bold text-sm truncate">{station.name}</h3>
       <p className="text-xs text-muted-foreground truncate mt-1">
         {station.country}
         {tags.length > 0 && ` · ${tags.map(t => t.trim()).join(', ')}`}

@@ -24,19 +24,19 @@ export function PlayerBar() {
   if (mini) {
     return (
       <div className="fixed bottom-4 right-4 z-50 animate-fade-in">
-        <div className="flex items-center gap-2 bg-card border border-border rounded-full pl-2 pr-1 py-1 shadow-lg shadow-black/30 backdrop-blur-xl">
+        <div className="flex items-center gap-2 bg-card border border-border pl-2 pr-1 py-1 shadow-lg shadow-black/20 backdrop-blur-xl">
           {currentStation.favicon ? (
-            <img src={currentStation.favicon} alt="" className="w-8 h-8 rounded-full object-cover bg-muted" onError={(e) => { e.currentTarget.src = ''; }} />
+            <img src={currentStation.favicon} alt="" className="w-8 h-8 object-cover bg-muted" onError={(e) => { e.currentTarget.src = ''; }} />
           ) : (
-            <div className="w-8 h-8 rounded-full bg-accent flex items-center justify-center">
+            <div className="w-8 h-8 bg-accent flex items-center justify-center">
               <Radio className="w-3 h-3 text-muted-foreground" />
             </div>
           )}
           <span className="text-xs font-medium max-w-[100px] truncate">{currentStation.name}</span>
-          <Button size="icon" className="w-7 h-7 rounded-full bg-foreground text-background hover:bg-foreground/90" onClick={handlePlayPause} disabled={isLoading}>
+          <Button size="icon" className="w-7 h-7 bg-foreground text-background hover:bg-foreground/90" onClick={handlePlayPause} disabled={isLoading}>
             {isLoading ? <Loader2 className="w-3 h-3 animate-spin" /> : isPlaying ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3 ml-0.5" />}
           </Button>
-          <Button size="icon" variant="ghost" className="w-7 h-7 rounded-full text-muted-foreground" onClick={() => setMini(false)}>
+          <Button size="icon" variant="ghost" className="w-7 h-7 text-muted-foreground" onClick={() => setMini(false)}>
             <ChevronUp className="w-3.5 h-3.5" />
           </Button>
         </div>
@@ -57,16 +57,16 @@ export function PlayerBar() {
               <img
                 src={currentStation.favicon}
                 alt={currentStation.name}
-                className="w-14 h-14 rounded object-cover bg-muted flex-shrink-0 shadow-md"
+                className="w-14 h-14 object-cover bg-muted flex-shrink-0 shadow-md"
                 onError={(e) => { e.currentTarget.src = ''; e.currentTarget.onerror = null; }}
               />
             ) : (
-              <div className="w-14 h-14 rounded bg-accent flex items-center justify-center flex-shrink-0">
+              <div className="w-14 h-14 bg-accent flex items-center justify-center flex-shrink-0">
                 <Radio className="w-5 h-5 text-muted-foreground" />
               </div>
             )}
             <div className="min-w-0">
-              <h4 className="font-medium text-sm truncate group-hover:text-primary transition-colors">{currentStation.name}</h4>
+              <h4 className="font-semibold text-sm truncate group-hover:text-primary transition-colors">{currentStation.name}</h4>
               <p className="text-xs text-muted-foreground truncate">
                 {currentStation.country}
                 {currentStation.bitrate ? ` · ${currentStation.bitrate}kbps` : ''}
@@ -79,7 +79,7 @@ export function PlayerBar() {
             {error && <p className="text-xs text-destructive mr-2 hidden sm:block">{error}</p>}
             <Button
               size="icon"
-              className="w-10 h-10 rounded-full bg-foreground text-background hover:bg-foreground/90 hover:scale-105 active:scale-95 transition-all"
+              className="w-10 h-10 bg-foreground text-background hover:bg-foreground/90 hover:scale-105 active:scale-95 transition-all"
               onClick={handlePlayPause}
               disabled={isLoading}
             >

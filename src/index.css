@@ -23,7 +23,7 @@
     --border: 0 0% 88%;
     --input: 0 0% 88%;
     --ring: 280 70% 55%;
-    --radius: 0.5rem;
+    --radius: 0.25rem;
 
     --sidebar-background: 0 0% 96%;
     --sidebar-foreground: 0 0% 20%;
@@ -74,7 +74,9 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-family: 'Merriweather', serif;
+    font-optical-sizing: auto;
+    font-variation-settings: "wdth" 100;
   }
 }
 
@@ -88,6 +90,10 @@
 
   .bg-gradient-brand {
     background: linear-gradient(135deg, hsl(330 80% 60%), hsl(280 80% 60%));
+  }
+
+  .bg-gradient-subtle {
+    background: linear-gradient(180deg, hsl(var(--background)), hsl(var(--card)));
   }
 
   .shadow-brand {
