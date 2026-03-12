@@ -122,7 +122,7 @@ export default function Landing() {
       <footer className="py-8 px-6 border-t border-border/50">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <img src={streamjetLogo} alt="StreamJet" className="h-8 opacity-60" />
-          <p className="text-xs text-muted-foreground">© {new Date().getFullYear()} StreamJet. All rights reserved.</p>
+          <p className="text-xs text-muted-foreground">© {new Date().getFullYear()} XZ1 Recording Ventures Inc.</p>
         </div>
       </footer>
     </div>
