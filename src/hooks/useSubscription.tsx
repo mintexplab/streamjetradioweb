@@ -20,7 +20,7 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   const checkSubscription = useCallback(async () => {
-    if (!user) {
+    if (!user || !session?.access_token) {
       setIsSubscribed(false);
       setSubscriptionEnd(null);
       setLoading(false);
@@ -40,7 +40,7 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
     } finally {
       setLoading(false);
     }
-  }, [user]);
+  }, [user, session?.access_token]);
 
   const startCheckout = async () => {
     if (!user) return;
