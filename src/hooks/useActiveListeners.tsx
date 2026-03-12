@@ -65,7 +65,7 @@ export function useActiveListeners(stationUuid: string) {
 export function useListenerPresence() {
   const { user } = useAuth();
   const { currentStation, isPlaying } = useRadioPlayer();
-  const heartbeatRef = useRef<NodeJS.Timeout | null>(null);
+  const heartbeatRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     if (!user || !currentStation || !isPlaying) {
