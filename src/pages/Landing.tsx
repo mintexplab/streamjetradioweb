@@ -1,8 +1,8 @@
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
-import { Radio, Headphones, Users, Zap, Globe, ArrowRight } from 'lucide-react';
-import streamjetLogo from '@/assets/streamjet-logo.png';
+import { Radio, Headphones, Globe, ArrowRight } from 'lucide-react';
+import streamjetLogo from '@/assets/streamjet-logo.svg';
 
 export default function Landing() {
   const { user } = useAuth();
@@ -18,7 +18,7 @@ export default function Landing() {
       {/* Nav */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <img src={streamjetLogo} alt="StreamJet" className="h-8" />
+          <img src={streamjetLogo} alt="StreamJet" className="h-10" />
           <div className="flex items-center gap-3">
             <Link to="/auth">
               <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
@@ -37,10 +37,6 @@ export default function Landing() {
       {/* Hero */}
       <section className="pt-32 pb-20 px-6">
         <div className="max-w-4xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium mb-8 animate-fade-in">
-            <Zap className="w-3.5 h-3.5" />
-            50,000+ radio stations worldwide
-          </div>
           <h1 className="text-5xl sm:text-7xl font-extrabold tracking-tight leading-[1.1] mb-6 animate-fade-in">
             Your world of
             <span className="text-gradient-brand block">radio, reimagined.</span>
@@ -87,21 +83,6 @@ export default function Landing() {
                 title: 'Live Radio',
                 description: 'Stream high-quality live radio with a sleek, minimalist player.',
               },
-              {
-                icon: Users,
-                title: 'Social Listening',
-                description: 'See what friends are tuned into and discover stations together.',
-              },
-              {
-                icon: Zap,
-                title: 'Reactions & Energy',
-                description: 'React to what\'s playing and see real-time energy levels on stations.',
-              },
-              {
-                icon: ArrowRight,
-                title: 'Music Identity',
-                description: 'Build your listening profile and share your unique taste with the world.',
-              },
             ].map((feature, i) => (
               <div
                 key={feature.title}
@@ -140,7 +121,7 @@ export default function Landing() {
       {/* Footer */}
       <footer className="py-8 px-6 border-t border-border/50">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <img src={streamjetLogo} alt="StreamJet" className="h-6 opacity-60" />
+          <img src={streamjetLogo} alt="StreamJet" className="h-8 opacity-60" />
           <p className="text-xs text-muted-foreground">© {new Date().getFullYear()} StreamJet. All rights reserved.</p>
         </div>
       </footer>
