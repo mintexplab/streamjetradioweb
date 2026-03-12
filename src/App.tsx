@@ -9,6 +9,7 @@ import { RadioPlayerProvider } from "@/hooks/useRadioPlayer";
 import { SubscriptionProvider } from "@/hooks/useSubscription";
 import { SpotifyAuthProvider } from "@/hooks/useSpotifyAuth";
 import { SpotifyPlayerProvider } from "@/hooks/useSpotifyPlayer";
+import { I18nProvider } from "@/hooks/useI18n";
 import Landing from "./pages/Landing";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
@@ -32,36 +33,38 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-      <AuthProvider>
-        <SubscriptionProvider>
-          <SpotifyAuthProvider>
-            <SpotifyPlayerProvider>
-              <RadioPlayerProvider>
-                <PresenceTracker>
-                  <TooltipProvider>
-                    <Toaster />
-                    <Sonner />
-                    <BrowserRouter>
-                      <Routes>
-                        <Route path="/" element={<Landing />} />
-                        <Route path="/auth" element={<Auth />} />
-                        <Route path="/player" element={<Dashboard />} />
-                        <Route path="/dashboard" element={<Navigate to="/player" replace />} />
-                        <Route path="/station/:stationUuid" element={<StationPage />} />
-                        <Route path="/profile/:handle" element={<PublicProfile />} />
-                        <Route path="/artist/:artistId" element={<ArtistPage />} />
-                        <Route path="/admin" element={<AdminDashboard />} />
-                        <Route path="/premium-analytics" element={<PremiumAnalytics />} />
-                        <Route path="*" element={<NotFound />} />
-                      </Routes>
-                    </BrowserRouter>
-                  </TooltipProvider>
-                </PresenceTracker>
-              </RadioPlayerProvider>
-            </SpotifyPlayerProvider>
-          </SpotifyAuthProvider>
-        </SubscriptionProvider>
-      </AuthProvider>
+      <I18nProvider>
+        <AuthProvider>
+          <SubscriptionProvider>
+            <SpotifyAuthProvider>
+              <SpotifyPlayerProvider>
+                <RadioPlayerProvider>
+                  <PresenceTracker>
+                    <TooltipProvider>
+                      <Toaster />
+                      <Sonner />
+                      <BrowserRouter>
+                        <Routes>
+                          <Route path="/" element={<Landing />} />
+                          <Route path="/auth" element={<Auth />} />
+                          <Route path="/player" element={<Dashboard />} />
+                          <Route path="/dashboard" element={<Navigate to="/player" replace />} />
+                          <Route path="/station/:stationUuid" element={<StationPage />} />
+                          <Route path="/profile/:handle" element={<PublicProfile />} />
+                          <Route path="/artist/:artistId" element={<ArtistPage />} />
+                          <Route path="/admin" element={<AdminDashboard />} />
+                          <Route path="/premium-analytics" element={<PremiumAnalytics />} />
+                          <Route path="*" element={<NotFound />} />
+                        </Routes>
+                      </BrowserRouter>
+                    </TooltipProvider>
+                  </PresenceTracker>
+                </RadioPlayerProvider>
+              </SpotifyPlayerProvider>
+            </SpotifyAuthProvider>
+          </SubscriptionProvider>
+        </AuthProvider>
+      </I18nProvider>
     </ThemeProvider>
   </QueryClientProvider>
 );
