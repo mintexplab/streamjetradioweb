@@ -1,8 +1,7 @@
-import { useAuth } from '@/hooks/useAuth';
 import { useIsAdmin } from '@/hooks/useAdminRole';
 import { useProfile } from '@/hooks/useProfile';
 import { useSubscription } from '@/hooks/useSubscription';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import {
   Sidebar,
   SidebarContent,
@@ -14,12 +13,12 @@ import {
   SidebarMenuItem,
   SidebarFooter,
 } from '@/components/ui/sidebar';
-import { Compass, Heart, Users, Search, Pin, Music, Shield, BarChart3 } from 'lucide-react';
-import streamjetLogo from '@/assets/streamjet-logo.png';
+import { Compass, Heart, Search, Pin, Shield, BarChart3 } from 'lucide-react';
+import streamjetLogo from '@/assets/streamjet-logo.svg';
 
 interface DashboardSidebarProps {
   view: string;
-  setView: (view: 'discover' | 'saved' | 'feed' | 'friends' | 'search' | 'library' | 'neighborhoods' | 'identity' | 'profile') => void;
+  setView: (view: 'discover' | 'saved' | 'search' | 'library' | 'profile') => void;
 }
 
 export function DashboardSidebar({ view, setView }: DashboardSidebarProps) {
@@ -37,14 +36,12 @@ export function DashboardSidebar({ view, setView }: DashboardSidebarProps) {
 
   const libraryItems = [
     { id: 'saved' as const, icon: Heart, label: 'Liked Stations' },
-    { id: 'friends' as const, icon: Users, label: 'Friends' },
-    { id: 'identity' as const, icon: Music, label: 'Music Identity' },
   ];
 
   return (
     <Sidebar className="border-r-0">
       <SidebarHeader className="p-5 pb-4">
-        <img src={streamjetLogo} alt="StreamJet" className="h-12 w-auto object-contain object-left" />
+        <img src={streamjetLogo} alt="StreamJet" className="h-16 w-auto object-contain object-left" />
       </SidebarHeader>
 
       <SidebarContent className="px-2">

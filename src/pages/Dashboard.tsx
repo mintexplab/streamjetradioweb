@@ -11,17 +11,13 @@ import { PlayerBar } from '@/components/dashboard/PlayerBar';
 import { SearchBar } from '@/components/dashboard/SearchBar';
 import { ProfileView } from '@/components/dashboard/ProfileView';
 import { SavedStationsView } from '@/components/dashboard/SavedStationsView';
-import { PostFeed } from '@/components/dashboard/PostFeed';
-import { FriendsList } from '@/components/dashboard/FriendsList';
 import { UserSearch } from '@/components/dashboard/UserSearch';
 import { StationLibrary } from '@/components/dashboard/StationLibrary';
-import { NeighborhoodsView } from '@/components/dashboard/NeighborhoodsView';
-import { MusicIdentityEditor } from '@/components/dashboard/MusicIdentityEditor';
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
 import { Navigate } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 
-type View = 'discover' | 'saved' | 'feed' | 'friends' | 'search' | 'library' | 'neighborhoods' | 'identity' | 'profile';
+type View = 'discover' | 'saved' | 'search' | 'library' | 'profile';
 type FilterType = { type: 'country' | 'tag' | 'none'; value?: string };
 
 export default function Dashboard() {
@@ -106,7 +102,7 @@ export default function Dashboard() {
                     />
                   </div>
                 ) : (
-                  <div className="space-y-8">
+                  <div className="space-y-10">
                     {genreRows.map((row, i) => (
                       <div key={row.label} style={{ animationDelay: `${i * 60}ms` }} className="animate-fade-in">
                         <StationRow
@@ -123,13 +119,9 @@ export default function Dashboard() {
                 )}
               </div>
             )}
-            {view === 'feed' && <PostFeed />}
             {view === 'saved' && <SavedStationsView stations={savedStations || []} />}
             {view === 'library' && <StationLibrary />}
-            {view === 'friends' && <FriendsList />}
             {view === 'search' && <UserSearch />}
-            {view === 'neighborhoods' && <NeighborhoodsView />}
-            {view === 'identity' && <MusicIdentityEditor />}
             {view === 'profile' && <ProfileView />}
           </div>
         </div>

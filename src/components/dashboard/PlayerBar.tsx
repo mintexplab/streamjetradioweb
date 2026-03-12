@@ -46,9 +46,6 @@ export function PlayerBar() {
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 animate-fade-in">
-      {/* Progress-like gradient line */}
-      <div className="h-[1px] bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
-
       <div className="bg-background/95 backdrop-blur-xl border-t border-border">
         <div className="flex items-center gap-3 px-4 py-2.5 max-w-screen-2xl mx-auto">
           {/* Station Info */}
@@ -60,12 +57,12 @@ export function PlayerBar() {
               <img
                 src={currentStation.favicon}
                 alt={currentStation.name}
-                className="w-11 h-11 rounded-md object-cover bg-muted flex-shrink-0 group-hover:shadow-brand transition-shadow"
+                className="w-14 h-14 rounded object-cover bg-muted flex-shrink-0 shadow-md"
                 onError={(e) => { e.currentTarget.src = ''; e.currentTarget.onerror = null; }}
               />
             ) : (
-              <div className="w-11 h-11 rounded-md bg-accent flex items-center justify-center flex-shrink-0">
-                <Radio className="w-4 h-4 text-muted-foreground" />
+              <div className="w-14 h-14 rounded bg-accent flex items-center justify-center flex-shrink-0">
+                <Radio className="w-5 h-5 text-muted-foreground" />
               </div>
             )}
             <div className="min-w-0">
@@ -77,8 +74,8 @@ export function PlayerBar() {
             </div>
           </div>
 
-          {/* Controls */}
-          <div className="flex items-center gap-1.5">
+          {/* Center Controls */}
+          <div className="flex items-center gap-2">
             {error && <p className="text-xs text-destructive mr-2 hidden sm:block">{error}</p>}
             <Button
               size="icon"
@@ -87,17 +84,17 @@ export function PlayerBar() {
               disabled={isLoading}
             >
               {isLoading ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
+                <Loader2 className="w-5 h-5 animate-spin" />
               ) : isPlaying ? (
-                <Pause className="w-4 h-4" />
+                <Pause className="w-5 h-5" />
               ) : (
-                <Play className="w-4 h-4 ml-0.5" />
+                <Play className="w-5 h-5 ml-0.5" />
               )}
             </Button>
           </div>
 
-          {/* Volume + actions */}
-          <div className="hidden sm:flex items-center gap-2">
+          {/* Right: Volume + actions */}
+          <div className="hidden sm:flex items-center gap-2 flex-1 justify-end">
             <div className="flex items-center gap-1.5 group/vol">
               <Button
                 size="icon"
@@ -118,7 +115,7 @@ export function PlayerBar() {
               </div>
             </div>
 
-            <div className="flex items-center gap-0.5 ml-1">
+            <div className="flex items-center gap-0.5 ml-2">
               <Button size="icon" variant="ghost" className="w-7 h-7 text-muted-foreground hover:text-foreground" onClick={() => setMini(true)} title="Mini player">
                 <ChevronDown className="w-3.5 h-3.5" />
               </Button>

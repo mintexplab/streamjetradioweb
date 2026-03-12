@@ -4,8 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { User, LogOut, Settings } from 'lucide-react';
-import streamjetLogo from '@/assets/streamjet-logo.png';
+import { User, LogOut } from 'lucide-react';
+import streamjetLogo from '@/assets/streamjet-logo.svg';
 
 interface DashboardHeaderProps {
   setView: (view: any) => void;
@@ -26,7 +26,7 @@ export function DashboardHeader({ setView }: DashboardHeaderProps) {
       <div className="flex items-center justify-between px-4 h-14">
         <div className="flex items-center gap-3">
           <SidebarTrigger className="h-8 w-8 md:hidden" />
-          <img src={streamjetLogo} alt="StreamJet" className="h-7 w-auto object-contain md:hidden" />
+          <img src={streamjetLogo} alt="StreamJet" className="h-8 w-auto object-contain md:hidden" />
         </div>
 
         <DropdownMenu>
@@ -51,10 +51,6 @@ export function DashboardHeader({ setView }: DashboardHeaderProps) {
             <DropdownMenuItem onClick={() => setView('profile')}>
               <User className="w-4 h-4 mr-2" />
               Profile
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setView('identity')}>
-              <Settings className="w-4 h-4 mr-2" />
-              Music Identity
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleSignOut} className="text-destructive focus:text-destructive">
