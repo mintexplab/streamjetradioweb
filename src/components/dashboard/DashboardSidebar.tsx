@@ -1,6 +1,7 @@
 import { useIsAdmin } from '@/hooks/useAdminRole';
 import { useProfile } from '@/hooks/useProfile';
 import { useSubscription } from '@/hooks/useSubscription';
+import { useI18n } from '@/hooks/useI18n';
 import { Link } from 'react-router-dom';
 import {
   Sidebar,
@@ -13,29 +14,32 @@ import {
   SidebarMenuItem,
   SidebarFooter,
 } from '@/components/ui/sidebar';
-import { Compass, Heart, Search, Pin, Shield, BarChart3 } from 'lucide-react';
+import { Compass, Heart, Search, Pin, Shield, BarChart3, Users, MessageCircle } from 'lucide-react';
 import streamjetLogo from '@/assets/streamjet-logo.svg';
 
 interface DashboardSidebarProps {
   view: string;
-  setView: (view: 'discover' | 'saved' | 'search' | 'library' | 'profile') => void;
+  setView: (view: 'discover' | 'saved' | 'search' | 'library' | 'profile' | 'people' | 'messages') => void;
 }
 
 export function DashboardSidebar({ view, setView }: DashboardSidebarProps) {
   const { data: isAdmin } = useIsAdmin();
   const { data: profile } = useProfile();
   const { isSubscribed } = useSubscription();
+  const { t } = useI18n();
 
   const hasPremiumAccess = isSubscribed || profile?.is_verified;
 
   const navItems = [
-    { id: 'discover' as const, icon: Compass, label: 'Discover' },
-    { id: 'search' as const, icon: Search, label: 'Search' },
-    { id: 'library' as const, icon: Pin, label: 'Your Library' },
+    { id: 'discover' as const, icon: Compass, label: t('discover') },
+    { id: 'search' as const, icon: Search, label: t('search') },
+    { id: 'people' as const, icon: Users, label: t('people') },
+    { id: 'library' as const, icon: Pin, label: t('yourLibrary') },
   ];
 
   const libraryItems = [
-    { id: 'saved' as const, icon: Heart, label: 'Liked Stations' },
+    { id: 'saved' as const, icon: Heart, label: t('likedStations') },
+    { id: 'messages' as const, icon: MessageCircle, label: t('conversations') },
   ];
 
   return (
@@ -86,7 +90,7 @@ export function DashboardSidebar({ view, setView }: DashboardSidebarProps) {
                   <Link to="/premium-analytics">
                     <SidebarMenuButton className="h-9 rounded-md text-sm">
                       <BarChart3 className="w-4 h-4" />
-                      <span>Analytics</span>
+                      <span>{t('analytics')}</span>
                     </SidebarMenuButton>
                   </Link>
                 </SidebarMenuItem>
@@ -101,7 +105,7 @@ export function DashboardSidebar({ view, setView }: DashboardSidebarProps) {
           <Link to="/admin">
             <SidebarMenuButton className="w-full h-9 rounded-md text-sm text-primary">
               <Shield className="w-4 h-4" />
-              <span>Admin</span>
+              <span>{t('admin')}</span>
             </SidebarMenuButton>
           </Link>
         )}
